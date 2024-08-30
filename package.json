@@ -6,7 +6,9 @@
     "start": "ts-node src/main/index.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --watch src --exec ts-node src/main/index.ts"
+    "dev": "nodemon --watch src --exec ts-node src/main/index.ts",
+    "migration": "npx typeorm migration:generate --dataSource ./dist/database/connection.js",
+    "runmig": "npx typeorm migration:run --dataSource ./dist/database/connection.js"
   },
   "author": "",
   "license": "ISC",
