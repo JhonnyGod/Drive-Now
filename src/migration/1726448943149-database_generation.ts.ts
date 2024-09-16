@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-//* Sistema de migraciones y backup de la database.
+//* Sistema de migraciones y backup de la database. No se toca.
 
 export class DatabaseGeneration implements MigrationInterface {
     name = 'DatabaseGeneration.ts1726448943149'
@@ -32,5 +32,4 @@ export class DatabaseGeneration implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "Usuarios"`);
         await queryRunner.query(`DROP TABLE "Organizaciones"`);
     }
-
 }
