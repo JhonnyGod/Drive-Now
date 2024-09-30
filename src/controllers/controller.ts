@@ -3,8 +3,7 @@
 import { Request, Response } from 'express';
 import { User } from '../entities/User';
 import { AppDataSource } from '../database/connection';
-import jwt, { Secret } from 'jsonwebtoken';
-import bcrypt from 'bcrypt'
+
 
 
 export const loginUser = async (req: Request<{}, {}, { email: string, password: string }>, res: Response) => {  
@@ -30,26 +29,7 @@ export const loginUser = async (req: Request<{}, {}, { email: string, password: 
         if (!MATCH) {
             return res.status(401).json({ ok: false, msg: 'Invalid credentials.' });
         }
-        const token = jwt.sign({
-            email: user.email
-        },
-            process.env.JWT_SECRETKEY as Secret,
-            {
-                expiresIn: "4h"
-            }
-        )
-
-        await tokenRepository.delete({ user: user });
-        const newToken = tokenRepository.create({
-            token: token,
-            user: user,
-        });
-
-        if (newToken.token) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedToken = await bcrypt.hash(newToken.token, salt);
-            newToken.hashedtoken = hashedToken;
-            const savedToken = await tokenRepository.save(newToken);
+    
             return res.json({
                 ok: true,
                 id_person: user.person?.id_person,
@@ -57,11 +37,8 @@ export const loginUser = async (req: Request<{}, {}, { email: string, password: 
                 email: user.email,
                 firstname: user.person?.firstname,
                 lastname: user.person?.lastname,
-                roles: roles?.map(role => role.role),
-                hashedToken
             });
-        }
-
+    
     } catch (error) {
         console.error('Error logging in user:', error);
         res.status(500).json({ ok: false, msg: 'Error logging in user' });
