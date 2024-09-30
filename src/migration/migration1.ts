@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from "typeorm";
 //* Sistema de migraciones y backup de la database. No se toca.
 
 export class DatabaseGeneration implements MigrationInterface {
-    name = 'DatabaseGeneration.ts1726448943149'
+    name = 'migration1'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "Organizaciones" ("id" SERIAL NOT NULL, "nit" character varying NOT NULL, "nombre" character varying NOT NULL, "contacto" character varying NOT NULL, "correo" character varying NOT NULL, "idusuario" integer NOT NULL, CONSTRAINT "REL_816183a26524dac83909454a55" UNIQUE ("idusuario"), CONSTRAINT "PK_55c37129f8f288610dd632baad7" PRIMARY KEY ("id"))`);

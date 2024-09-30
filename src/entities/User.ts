@@ -12,8 +12,12 @@ export class User {
     @Column()
     password?: string;
 
+    @Column()
+    email?: string;
+
     @OneToOne(() => Organization, organization => organization.user)
     organization?: Organization;
+
 
 }
 
