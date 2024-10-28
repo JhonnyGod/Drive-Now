@@ -14,7 +14,6 @@ export class UserService{
         this.personRepository = AppDataSource.getRepository(Person);
     }
 
-
     public async crearUsuario(userInfo: UserInfo){
         const {username, email, password, documento, firstname , lastname, telefono } = userInfo;
         const newUser = new User();

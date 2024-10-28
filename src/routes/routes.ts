@@ -4,7 +4,7 @@ import { createUser } from "../controllers/usercontroller";
 const routes = Router();
 
 
-routes.post('/usuarios', createUser); //* Crear usuario
+routes.post('/usuario/registrarse', createUser); //* Crear usuario
 
 
 
