@@ -22,10 +22,7 @@ export class Person extends BaseEntity{
 
     @Column()
     telefono?: string;
-
-    @Column()
-    correo?: string;
-
+    
     @OneToOne(() => User)
     @JoinColumn({ name: 'id_usuario' }) 
     user?: User;

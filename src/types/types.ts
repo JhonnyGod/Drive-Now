@@ -1,8 +1,8 @@
 export interface UserInfo{
-    documento: string;
     username: string;
     password: string;
     email: string;
+    documento: string;
     firstname: string;
     lastname: string;
     telefono: string;

@@ -16,10 +16,25 @@ export class UserService{
 
 
     public async crearUsuario(userInfo: UserInfo){
-        return 0
+        const {username, email, password, documento, firstname , lastname, telefono } = userInfo;
+        const newUser = new User();
+        newUser.username = username;
+        newUser.email = email;
+        newUser.password = password;
+        await this.usersRepository.save(newUser);
+
+        const person = new Person();
+        person.nombre = firstname;
+        person.apellido = lastname;
+        person.telefono = telefono;
+        person.documento = documento;
+        person.user = newUser;
+        await this.personRepository.save(person);
+
+        return {usuario: newUser, persona: person}
     }
 
-
+ 
     public async initUser(userData: userLogin){
         console.log("Jairo es un cacorro de segundo grado")
         return userData    

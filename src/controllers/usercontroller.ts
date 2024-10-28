@@ -43,6 +43,8 @@ export const createUser = async (req: Request<{}, {}, UserInfo>, res: Response) 
             return res.status(400).json({ ok: false, message: 'boom' });
         }
 
+        return res.status(200).json({ ok: true, message: 'User created successfully', user: userCreatePetition });
+
     } catch (error) {
 
         return res.status(422).json({ ok: false, message: 'Error while processing data' })
