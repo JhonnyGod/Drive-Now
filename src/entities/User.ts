@@ -15,9 +15,6 @@ export class User extends BaseEntity {
     @Column()
     email?: string;
 
-    @Column()
-    breakfast?: boolean;
-
     @OneToOne(() => Organization, organization => organization.user)
     organization?: Organization;
 

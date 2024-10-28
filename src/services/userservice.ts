@@ -16,8 +16,7 @@ export class UserService{
 
 
     public async crearUsuario(userInfo: UserInfo){
-        console.log("Jairo es un cacorro de primer grado")
-        return userInfo
+        return 0
     }
 
 

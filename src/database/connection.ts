@@ -8,8 +8,7 @@ import { Person } from "../entities/Persons";
 import { Rental } from "../entities/Rental";
 import { Vehicle } from "../entities/Vehicles";
 import { Invoice } from "../entities/Invoice"; 
-import { Migration } from "typeorm";
-import path from "path";
+
 
 dotenv.config();
 
@@ -23,7 +22,7 @@ export const AppDataSource = new DataSource({
     synchronize: false,
     logging: true,
     entities: [User,Organization,Person,Rental,Vehicle,Invoice],
-    migrations: ['src/migrations/**/*.ts'],
+    migrations: ['src/migration/**/*.ts'],
     subscribers: [],
     migrationsTableName: 'migrations'   
 });

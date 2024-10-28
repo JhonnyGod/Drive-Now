@@ -6,74 +6,62 @@ import { Request, Response } from "express";
 import { User } from "../entities/User";
 import { AppDataSource } from "../database/connection";
 import { UserService } from "../services/userservice";
-import { Jwt } from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import { types } from "util";
 import { UserInfo, userLogin } from "../types/types";
-import { ok } from "assert";
 import { Person } from "../entities/Persons";
-import { userInfo } from "os";
 
 const userService = new UserService();
 
 export const createUser = async (req: Request<{}, {}, UserInfo>, res: Response) => {
     const { username, password, email, firstname, lastname, telefono, documento } = req.body;
-
     try {
-        if(!username || !password || !email || !firstname || !lastname || !telefono || !documento) {
-            return res.status(400).json({ok: false, message: 'User info has missing fields'});
+        if (!username || !password || !email || !firstname || !lastname || !telefono || !documento) {
+            return res.status(400).json({ ok: false, message: 'User info has missing fields' });
         }
-    
         const checkUsername = await User.findOneBy({ username });
         if (checkUsername) {
-            return res.status(400).json({ok: false, message: 'Username already in use'});
+            return res.status(400).json({ ok: false, message: 'Username already in use' });
         }
 
         const checkEmail = await User.findOneBy({ email });
         if (checkEmail) {
-            return res.status(400).json({ok: false, message: 'Email already in use'});
+            return res.status(400).json({ ok: false, message: 'Email already in use' });
         }
 
         const checkPhoneNumber = await Person.findOneBy({ telefono });
         if (checkPhoneNumber) {
-            return res.status(400).json({ok: false, message: 'Phone already in use'});
+            return res.status(400).json({ ok: false, message: 'Phone already in use' });
         }
-    
+
         const checkDocument = await Person.findOneBy({ documento });
         if (checkDocument) {
-            return res.status(400).json({ok: false, message: 'id already'});
+            return res.status(400).json({ ok: false, message: 'id already' });
         }
 
-        const petUser = await userService.crearUsuario( req.body );
+        const userCreatePetition = await userService.crearUsuario(req.body);
 
-        if (!petUser){
-            return res.status(400).json({ok: false, message: 'boom'});
+        if (!userCreatePetition) {
+            return res.status(400).json({ ok: false, message: 'boom' });
         }
-        
+
     } catch (error) {
 
-        return res.status(422).json({ok: false, message: 'ERROR al procesar los datos'})
+        return res.status(422).json({ ok: false, message: 'Error while processing data' })
     }
-
 }
 
-export const loginUser = async(req: Request<{}, {}, userLogin>, res:Response) => {
-    const{ username, password } = req.body;
-
+export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) => {
+    const { username, password } = req.body;
     try {
-        
-        if(!username || !password ) {
-            return res.status(400).json({ok: false, message: 'User info has missing fields'});
+        if (!username || !password) {
+            return res.status(400).json({ ok: false, message: 'User info has missing fields' });
         }
-
 
         const initUser = await userService.initUser(req.body);
-        if(!initUser){
-            return res.status(422).json({ok: false, message: 'ocurrio un error al iniciar sesion'})
+        if (!initUser) {
+            return res.status(422).json({ ok: false, message: 'There was an error while login user' })
         }
-        
     } catch (error) {
-        return res.status(422).json({ok: false, message: 'ERROR al iniciar sesion'})
+        return res.status(422).json({ ok: false, message: 'There was an error when login user' })
     }
 }
 
