@@ -1,9 +1,15 @@
 export interface UserInfo{
-    id: string;
+    documento: string;
     username: string;
     password: string;
     email: string;
     firstname: string;
     lastname: string;
-    phonenumber: string;
+    telefono: string;
+}
+
+
+export interface userLogin{
+    username: string;
+    password: string;
 }
