@@ -44,13 +44,10 @@ export const createUser = async (req: Request<{}, {}, UserInfo>, res: Response) 
             return res.status(400).json({ok: false, message: 'id already'});
         }
 
-
-
-        const petUser = await userService.crearusuario( username, password, email, firstname, lastname, telefono, documento );
+        const petUser = await userService.crearUsuario( req.body );
 
         if (!petUser){
             return res.status(400).json({ok: false, message: 'boom'});
-        
         }
         
     } catch (error) {
@@ -60,27 +57,20 @@ export const createUser = async (req: Request<{}, {}, UserInfo>, res: Response) 
 
 }
 
-
 export const loginUser = async(req: Request<{}, {}, userLogin>, res:Response) => {
     const{ username, password } = req.body;
 
     try {
-
+        
         if(!username || !password ) {
             return res.status(400).json({ok: false, message: 'User info has missing fields'});
         }
 
 
-        const initUser = await UserService.initUser(username, password);
+        const initUser = await userService.initUser(req.body);
         if(!initUser){
             return res.status(422).json({ok: false, message: 'ocurrio un error al iniciar sesion'})
         }
-
-
-
-
-
-
         
     } catch (error) {
         return res.status(422).json({ok: false, message: 'ERROR al iniciar sesion'})
