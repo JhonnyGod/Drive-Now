@@ -7,7 +7,9 @@ import { Organization } from "../entities/Organizations";
 import { Person } from "../entities/Persons";
 import { Rental } from "../entities/Rental";
 import { Vehicle } from "../entities/Vehicles";
-import { Invoice } from "../entities/Invoice";
+import { Invoice } from "../entities/Invoice"; 
+import { Migration } from "typeorm";
+import path from "path";
 
 dotenv.config();
 
@@ -18,9 +20,10 @@ export const AppDataSource = new DataSource({
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    synchronize: true,
-    logging: false,
+    synchronize: false,
+    logging: true,
     entities: [User,Organization,Person,Rental,Vehicle,Invoice],
-    migrations: [__dirname + '/../migration/**/*.ts'],
-    subscribers: []
+    migrations: ['src/migrations/**/*.ts'],
+    subscribers: [],
+    migrationsTableName: 'migrations'   
 });

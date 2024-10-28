@@ -1,10 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToOne, BaseEntity } from 'typeorm';
 import { Person } from './Persons';
 import { Vehicle } from './Vehicles';
 import { Invoice } from './Invoice';
 
 @Entity('Alquileres')
-export class Rental {
+export class Rental extends BaseEntity{
 
     @PrimaryGeneratedColumn()
     idalquiler?: number;  
