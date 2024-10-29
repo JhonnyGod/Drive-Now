@@ -57,13 +57,14 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
         if (!username || !password) {
             return res.status(400).json({ ok: false, message: 'User info has missing fields' });
         }
-
         const initUser = await userService.initUser(req.body);
+
         if (!initUser) {
             return res.status(422).json({ ok: false, message: 'User not found, please create an account' })
         }
-        return res.status(200).json({ ok: true, message: 'User logged in successfully', user: initUser });
         
+        return res.status(200).json({ ok: true, message: 'User logged in successfully', user: initUser });
+
     } catch (error) {
         return res.status(422).json({ ok: false, message: 'There was an error when login user' })
     }

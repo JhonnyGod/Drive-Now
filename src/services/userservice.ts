@@ -4,7 +4,10 @@ import { AppDataSource } from '../database/connection';
 import { Person } from '../entities/Persons';
 import { UserInfo, userLogin } from '../types/types';
 import bcrypt from 'bcrypt';
-import { hash } from 'crypto';
+import jwt, { Secret } from "jsonwebtoken";
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 export class UserService {
 
@@ -42,26 +45,39 @@ export class UserService {
 
 
     public async initUser(userData: userLogin) {
+
         const { username, password } = userData;
         if (!username || !password) {
             return false;
         }
-        const user = await this.usersRepository.findOneBy({ username });
-        if (!user) {
+
+        const User = await this.usersRepository.findOneBy({ username });
+
+        if (!User) {
             return false;
         }
 
-        if (!user.password) {
+        if (!User.password) {
             return false;
         }
 
-        const checkPassword = await bcrypt.compare(password, user.password);
+        const checkPassword = await bcrypt.compare(password, User.password);
         if (!checkPassword) {
             return false;
         }
 
-        //TODO: Generar token de autenticación por medio de JWT (Estoy profundizando en eso, aun no se donde guardarlo)
-        return user;
-    }
+        const checkedUserData = { //* Payload del usuario, se almacena esta información en el token
+            username: User.username,
+            email: User.email,
+            user_id: User.id
+        }
 
+        const jwtSecret = process.env.JWT_SECRET as Secret; //* Cambiar el tipo de la SecretWord de JWT
+
+        const Token = jwt.sign(checkedUserData, jwtSecret, { expiresIn: "2h" }); //* Generar el token de autenticación
+
+        //TODO:Estoy pensando en donde guardar el token.
+
+        return { username: User.username, email: User.email, token: Token };
+    }
 }
