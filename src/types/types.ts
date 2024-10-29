@@ -19,4 +19,7 @@ export interface forgotPassword{
 }
 
 
-//Lo que necesitas es enviarme la solicitud al servicio sendEmail de la instancia userService
+export interface changePassword{
+    password: string;
+    code: string;
+}

@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { User } from '../entities/User';
 import { AppDataSource } from '../database/connection';
 import { Person } from '../entities/Persons';
-import { forgotPassword, UserInfo, userLogin } from '../types/types';
+import { changePassword, forgotPassword, UserInfo, userLogin } from '../types/types';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from "jsonwebtoken";
 const nodemailer = require("nodemailer");
@@ -136,5 +136,12 @@ export class UserService {
             return { ok: false, message: 'User not found' };
 
         }
+    }
+
+
+    public async newPassword(userData: changePassword){
+        const {password} = userData;
+
+
     }
 }
