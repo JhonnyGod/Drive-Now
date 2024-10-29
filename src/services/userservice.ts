@@ -81,21 +81,23 @@ export class UserService {
     }
 
 
-    public async sendEmail(userData: forgotPassword) {
-        const {email} = userData;
-//TODO: Implementar la lógica para la actualización de la contraseña. Los correos ya son enviados a los usuarios.
-
+    public async sendRecoveryEmail(userData: forgotPassword) {
+        const { email } = userData;
+        //TODO: Implementar la lógica para la actualización de la contraseña. Los correos ya son enviados a los usuarios.
         try {
-            if(!email){
-                return {ok: false, message: 'Email is required'};
+            if (!email) {
+                return { ok: false, message: 'Email is required' };
             }
-    
-            const user = await this.usersRepository.findOneBy({email});
-    
-            if(!user){
-                return {ok: true, message: `If email exists, an email will be sent to ${email}`};
+            const user = await this.usersRepository.findOneBy({ email });
+            if (!user) {
+                return { ok: true, message: `If email exists, an email will be sent to ${email}` };
             }
-    
+
+            //* Generar un código de recuperación
+            const recoveryCode = Math.floor(1000 + Math.random() * 9000);
+            user.recoveryCode = recoveryCode.toString();
+            await this.usersRepository.save(user);
+
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -108,15 +110,31 @@ export class UserService {
                 from: process.env.EMAIL_USER,
                 to: user.email,
                 subject: 'Drive now password reset',
-                text: 'This is a test email.',
-              };
-    
+                text: 'El siguiente código es para restablecer su contraseña: ' + user.recoveryCode,
+            };
+
             const send = await transporter.sendMail(mailOptions);
-            
-            return {ok: true, message: `If email exists, an email will be sent to ${email}`};
+            if (send) {
+                return { ok: true, message: `If email exists, an email will be sent to ${email}` };}
 
         } catch (error) {
-            return {ok: false, message: 'Error while sending email', error: error};
+            return { ok: false, message: 'Error while sending email', error: error };
+        }
+    }
+
+    public async checkCode(email: string, code: string) {
+        const verification = await this.usersRepository.findOneBy({ email, recoveryCode: code });
+        if (!verification) {
+            return false
+        }
+        true
+    }
+
+    public async changePassword(userData:changePassword) {
+        const user = await this.usersRepository.findOneBy({ recoveryCode: code });
+        if (!user) {
+            return { ok: false, message: 'User not found' };
+
         }
     }
 }

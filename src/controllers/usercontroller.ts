@@ -78,10 +78,10 @@ export const passwordForgot = async (req: Request<{}, {}, forgotPassword>, res: 
             return res.status(400).json({ok: false, message: 'empty field, enter your email'})
         }
 
-        const  sendEmail = await userService.sendEmail(req.body);
+        const  sendEmail = await userService.sendRecoveryEmail(req.body);
 
         if( sendEmail ){
-            return res.status(200).json({ ok: true, message: 'Email sent successfully' });
+            return sendEmail;
 
         }else {
             return res.status(500).json({ ok: false, message: 'Failed to send email' });
