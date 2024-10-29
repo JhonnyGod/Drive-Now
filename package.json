@@ -22,6 +22,7 @@
     "drive-now": "file:",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.16",
     "nodemon": "^3.1.4",
     "pg": "^8.12.0",
     "reflect-metadata": "^0.2.2",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.5.1",
+    "@types/nodemailer": "^6.4.16",
     "ts-node": "^10.9.2"
   }
 }

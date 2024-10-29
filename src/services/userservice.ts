@@ -5,6 +5,7 @@ import { Person } from '../entities/Persons';
 import { forgotPassword, UserInfo, userLogin } from '../types/types';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from "jsonwebtoken";
+const nodemailer = require("nodemailer");
 
 
 export class UserService {
@@ -82,7 +83,40 @@ export class UserService {
 
     public async sendEmail(userData: forgotPassword) {
         const {email} = userData;
+//TODO: Implementar la lógica para la actualización de la contraseña. Los correos ya son enviados a los usuarios.
 
+        try {
+            if(!email){
+                return {ok: false, message: 'Email is required'};
+            }
+    
+            const user = await this.usersRepository.findOneBy({email});
+    
+            if(!user){
+                return {ok: true, message: `If email exists, an email will be sent to ${email}`};
+            }
+    
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                }
+            })
 
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: user.email,
+                subject: 'Drive now password reset',
+                text: 'This is a test email.',
+              };
+    
+            const send = await transporter.sendMail(mailOptions);
+            
+            return {ok: true, message: `If email exists, an email will be sent to ${email}`};
+
+        } catch (error) {
+            return {ok: false, message: 'Error while sending email', error: error};
+        }
     }
 }
