@@ -60,6 +60,7 @@ export class UserService {
             return false;
         }
 
+        //TODO: Generar token de autenticación por medio de JWT (Estoy profundizando en eso, aun no se donde guardarlo)
         return user;
     }
 

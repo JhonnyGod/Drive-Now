@@ -13,7 +13,4 @@ routes.post('/usuario/login', loginUser); //* Iniciar sesión, esta Ruta indica 
 
 
 
-
-
-
 export default routes;
