@@ -6,8 +6,9 @@ import { Request, Response } from "express";
 import { User } from "../entities/User";
 import { AppDataSource } from "../database/connection";
 import { UserService } from "../services/userservice";
-import { UserInfo, userLogin } from "../types/types";
+import { forgotPassword, UserInfo, userLogin } from "../types/types";
 import { Person } from "../entities/Persons";
+import { send } from "process";
 
 const userService = new UserService();
 
@@ -67,6 +68,30 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
 
     } catch (error) {
         return res.status(422).json({ ok: false, message: 'There was an error when login user' })
+    }
+}
+
+
+export const passwordForgot = async (req: Request<{}, {}, forgotPassword>, res: Response) => {
+    const {email} = req.body;
+    try {
+        if (!email){
+            return res.status(400).json({ok: false, message: 'empty field, enter your email'})
+        }
+
+        const  sendEmail = await userService.sendEmail(req.body);
+
+        if( sendEmail ){
+            return res.status(200).json({ ok: true, message: 'Email sent successfully' });
+
+        }else {
+            return res.status(500).json({ ok: false, message: 'Failed to send email' });
+        }
+
+
+        
+    } catch (error) {
+        return res.status(422).json({ok: false, message: 'email not found'})
     }
 }
 

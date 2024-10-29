@@ -2,7 +2,7 @@ import { Repository } from 'typeorm';
 import { User } from '../entities/User';
 import { AppDataSource } from '../database/connection';
 import { Person } from '../entities/Persons';
-import { UserInfo, userLogin } from '../types/types';
+import { forgotPassword, UserInfo, userLogin } from '../types/types';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from "jsonwebtoken";
 import dotenv from 'dotenv';
@@ -79,5 +79,12 @@ export class UserService {
         //TODO:Estoy pensando en donde guardar el token.
 
         return { username: User.username, email: User.email, token: Token };
+    }
+
+
+    public async sendEmail(userData: forgotPassword) {
+        const {email} = userData;
+
+
     }
 }
