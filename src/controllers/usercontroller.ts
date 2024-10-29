@@ -4,7 +4,6 @@
 
 import { Request, Response } from "express";
 import { User } from "../entities/User";
-import { AppDataSource } from "../database/connection";
 import { UserService } from "../services/userservice";
 import { UserInfo, userLogin } from "../types/types";
 import { Person } from "../entities/Persons";

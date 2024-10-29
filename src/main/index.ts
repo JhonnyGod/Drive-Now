@@ -14,7 +14,6 @@ const connect = async () => {
     try {
         await AppDataSource.initialize();
         console.log("Conexión exitosa 😘😘😘");
-
     } catch (error) {
         console.log("Error en la conexión 😭😭😭", error);
     }

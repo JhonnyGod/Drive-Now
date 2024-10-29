@@ -5,8 +5,6 @@ import { Person } from '../entities/Persons';
 import { UserInfo, userLogin } from '../types/types';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from "jsonwebtoken";
-import dotenv from 'dotenv';
-dotenv.config();
 
 
 export class UserService {
