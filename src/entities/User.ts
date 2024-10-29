@@ -15,8 +15,8 @@ export class User extends BaseEntity {
     @Column()
     email?: string;
 
-    @Column({nullable: true})
-    recoveryCode?: string;
+    @Column({type: 'varchar', nullable: true})
+    recoveryCode?: string | null | undefined;
 
     @OneToOne(() => Organization, organization => organization.user)
     organization?: Organization;

@@ -83,12 +83,21 @@ export class UserService {
 
     public async sendRecoveryEmail(userData: forgotPassword) {
         const { email } = userData;
-        //TODO: Implementar la lógica para la actualización de la contraseña. Los correos ya son enviados a los usuarios.
+        console.log(email);
+        console.log(email);
+        console.log(email);
+        console.log(email);
+        console.log(email);
+        console.log(email);
+        console.log(email);
+        console.log(email);
         try {
             if (!email) {
                 return { ok: false, message: 'Email is required' };
             }
+
             const user = await this.usersRepository.findOneBy({ email });
+
             if (!user) {
                 return { ok: true, message: `If email exists, an email will be sent to ${email}` };
             }
@@ -115,9 +124,12 @@ export class UserService {
 
             const send = await transporter.sendMail(mailOptions);
             if (send) {
-                return { ok: true, message: `If email exists, an email will be sent to ${email}` };}
+                return true;
+            }
+            return false;
 
         } catch (error) {
+            console.log(error);
             return { ok: false, message: 'Error while sending email', error: error };
         }
     }
@@ -130,18 +142,24 @@ export class UserService {
         true
     }
 
-    public async changePassword(userData:changePassword) {
-        const user = await this.usersRepository.findOneBy({ recoveryCode: code });
-        if (!user) {
-            return { ok: false, message: 'User not found' };
-
-        }
-    }
-
-
-    public async newPassword(userData: changePassword){
-        const {password} = userData;
-
-
+    public async newPassword(userData: changePassword) {
+       try {
+         const { code, password } = userData;
+         const user = await this.usersRepository.findOneBy({ recoveryCode: code });
+ 
+         if (!user) {
+             return false;
+         }
+ 
+         const salt = await bcrypt.genSalt(10);
+         const hashedPassword = await bcrypt.hash(password, salt);
+         user.password = hashedPassword;
+         user.recoveryCode = null;
+         await this.usersRepository.save(user);
+         return true;
+       } catch (error) {
+              console.log(error);
+              return false;
+       }
     }
 }

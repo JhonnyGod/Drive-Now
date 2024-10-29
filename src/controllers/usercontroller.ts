@@ -62,7 +62,7 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
         if (!initUser) {
             return res.status(422).json({ ok: false, message: 'User not found, please create an account' })
         }
-        
+
         return res.status(200).json({ ok: true, message: 'User logged in successfully', user: initUser });
 
     } catch (error) {
@@ -74,48 +74,43 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
 export const passwordForgot = async (req: Request<{}, {}, forgotPassword>, res: Response) => {
     const { email } = req.body;
     try {
-        if (!email){
-            return res.status(400).json({ok: false, message: 'empty field, enter your email'})
+        if (!email) {
+            return res.status(400).json({ ok: false, message: 'empty field, enter your email' })
         }
 
-<<<<<<< HEAD
-        const  sendEmail = await userService.sendRecoveryEmail(req.body);
-=======
-        const sendEmail = await userService.sendEmail(req.body);
->>>>>>> f64cdbcaa7bde93174a77be1474223311dbe2db1
+        const sendEmail = await userService.sendRecoveryEmail(req.body);
 
-        if( sendEmail ){
-            return sendEmail;
+        if (sendEmail) {
+            return res.status(200).json({ ok: true, message: 'Email sent successfully' });
 
-        }else {
+        } else {
             return res.status(500).json({ ok: false, message: 'Failed to send email' });
         }
 
     } catch (error) {
-        return res.status(422).json({ok: false, message: 'email not found'});
+        return res.status(422).json({ ok: false, message: 'email not found' });
     }
 }
 
 
 export const newPassword = async (req: Request<{}, {}, changePassword>, res: Response) => {
     const { code, password } = req.body
-
     try {
-        if(!password || !code){
+        if (!password || !code) {
 
-            return res.status(400).json({ok: false, message: 'User info has missing fields'});
+            return res.status(400).json({ ok: false, message: 'User info has missing fields' });
         }
 
         const newPassword = await userService.newPassword(req.body);
 
-        if(newPassword){
-            return res.status(200).json({ok: true, message: 'new password sent'});
+        if (newPassword) {
+            return res.status(200).json({ ok: true, message: 'new password applied, now log in' });
 
-        }else{
-            return res.status(200).json({ok: false, message: 'new password failed'});
+        } else {
+            return res.status(200).json({ ok: false, message: 'new password failed' });
         }
     } catch (error) {
-        
+        return res.status (422).json({ ok: false, message: 'error while processing data' });
     }
 }
 
