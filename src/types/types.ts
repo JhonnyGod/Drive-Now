@@ -13,3 +13,10 @@ export interface userLogin{
     username: string;
     password: string;
 }
+
+export interface forgotPassword{
+    email: string;
+}
+
+
+//Lo que necesitas es enviarme la solicitud al servicio sendEmail de la instancia userService
