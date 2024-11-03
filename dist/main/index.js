@@ -17,7 +17,9 @@ require("reflect-metadata");
 const express_1 = __importDefault(require("express"));
 const connection_1 = require("../database/connection");
 const routes_1 = __importDefault(require("../routes/routes"));
+const cors = require('cors');
 const app = (0, express_1.default)();
+app.use(cors());
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 const connect = () => __awaiter(void 0, void 0, void 0, function* () {

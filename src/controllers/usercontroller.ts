@@ -5,7 +5,7 @@
 import { Request, Response } from "express";
 import { User } from "../entities/User";
 import { UserService } from "../services/userservice";
-import { changePassword, forgotPassword, UserInfo, userLogin } from "../types/types";
+import { changePassword, forgotPassword, UserInfo, userLogin, validateCode } from "../types/types";
 import { Person } from "../entities/Persons";
 
 
@@ -52,9 +52,9 @@ export const createUser = async (req: Request<{}, {}, UserInfo>, res: Response) 
 }
 
 export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
     try {
-        if (!username || !password) {
+        if (!email || !password) {
             return res.status(400).json({ ok: false, message: 'User info has missing fields' });
         }
         const initUser = await userService.initUser(req.body);
@@ -81,7 +81,7 @@ export const passwordForgot = async (req: Request<{}, {}, forgotPassword>, res: 
         const sendEmail = await userService.sendRecoveryEmail(req.body);
 
         if (sendEmail) {
-            return res.status(200).json({ ok: true, message: 'Email sent successfully' });
+            return res.status(200).json(sendEmail);
 
         } else {
             return res.status(500).json({ ok: false, message: 'Failed to send email' });
@@ -92,12 +92,27 @@ export const passwordForgot = async (req: Request<{}, {}, forgotPassword>, res: 
     }
 }
 
+export const checkMatching = async (req: Request<{}, {}, validateCode>, res: Response) => {
+    const { code, email } = req.body;
+    try {
+        if (!code || !email) {
+            return res.status(400).json({ ok: false, message: 'missing fields' });
+        }
+        const check = await userService.checkCode(req.body);
+        if (check) {
+            return res.status(200).json({ ok: true, message: 'code matches' });
+        }
+        return res.status(400).json({ ok: false, message: 'code does not match' });
+
+    } catch (error) {
+        return res.status(422).json({ ok: false, message: 'error while processing data' });
+    }
+}
 
 export const newPassword = async (req: Request<{}, {}, changePassword>, res: Response) => {
-    const { code, password } = req.body
+    const { code, password, email } = req.body
     try {
-        if (!password || !code) {
-
+        if (!password || !code || !email) {
             return res.status(400).json({ ok: false, message: 'User info has missing fields' });
         }
 
@@ -107,10 +122,11 @@ export const newPassword = async (req: Request<{}, {}, changePassword>, res: Res
             return res.status(200).json({ ok: true, message: 'new password applied, now log in' });
 
         } else {
-            return res.status(200).json({ ok: false, message: 'new password failed' });
+            return res.status(400).json({ ok: false, message: 'new password failed' });
         }
+
     } catch (error) {
-        return res.status (422).json({ ok: false, message: 'error while processing data' });
+        return res.status(422).json({ ok: false, message: 'error while processing data' });
     }
 }
 

@@ -1,8 +1,8 @@
-import { Repository } from 'typeorm';
+import { Code, Repository } from 'typeorm';
 import { User } from '../entities/User';
 import { AppDataSource } from '../database/connection';
 import { Person } from '../entities/Persons';
-import { changePassword, forgotPassword, UserInfo, userLogin } from '../types/types';
+import { changePassword, forgotPassword, UserInfo, userLogin, validateCode } from '../types/types';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from "jsonwebtoken";
 const nodemailer = require("nodemailer");
@@ -45,12 +45,12 @@ export class UserService {
 
     public async initUser(userData: userLogin) {
 
-        const { username, password } = userData;
-        if (!username || !password) {
+        const { email, password } = userData;
+        if (!email || !password) {
             return false;
         }
 
-        const User = await this.usersRepository.findOneBy({ username });
+        const User = await this.usersRepository.findOneBy({ email });
 
         if (!User) {
             return false;
@@ -77,20 +77,12 @@ export class UserService {
 
         //TODO:Estoy pensando en donde guardar el token.
 
-        return { username: User.username, email: User.email, token: Token };
+        return { username: User.username, email: User.email, id_user: User.id, token: Token };
     }
 
 
     public async sendRecoveryEmail(userData: forgotPassword) {
         const { email } = userData;
-        console.log(email);
-        console.log(email);
-        console.log(email);
-        console.log(email);
-        console.log(email);
-        console.log(email);
-        console.log(email);
-        console.log(email);
         try {
             if (!email) {
                 return { ok: false, message: 'Email is required' };
@@ -119,12 +111,13 @@ export class UserService {
                 from: process.env.EMAIL_USER,
                 to: user.email,
                 subject: 'Drive now password reset',
-                text: 'El siguiente código es para restablecer su contraseña: ' + user.recoveryCode,
+                text: 'Your password recovery code is:' + user.recoveryCode,
             };
 
             const send = await transporter.sendMail(mailOptions);
             if (send) {
-                return true;
+                console.log("Email Sent")
+                return { ok: true, message: "If email exits, an email will be sent to it." };
             }
             return false;
 
@@ -134,32 +127,35 @@ export class UserService {
         }
     }
 
-    public async checkCode(email: string, code: string) {
-        const verification = await this.usersRepository.findOneBy({ email, recoveryCode: code });
-        if (!verification) {
-            return false
-        }
-        true
-    }
 
     public async newPassword(userData: changePassword) {
-       try {
-         const { code, password } = userData;
-         const user = await this.usersRepository.findOneBy({ recoveryCode: code });
- 
-         if (!user) {
-             return false;
-         }
- 
-         const salt = await bcrypt.genSalt(10);
-         const hashedPassword = await bcrypt.hash(password, salt);
-         user.password = hashedPassword;
-         user.recoveryCode = null;
-         await this.usersRepository.save(user);
-         return true;
-       } catch (error) {
-              console.log(error);
-              return false;
-       }
+        try {
+            const { code, password, email } = userData;
+            const user = await this.usersRepository.findOneBy({ email: email, recoveryCode: code });
+
+            if (!user) {
+                return false;
+            }
+
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+
+            user.password = hashedPassword;
+            user.recoveryCode = null;
+            await this.usersRepository.save(user);
+            return true;
+
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    public async checkCode(dataToValidate: validateCode) {
+        const user = await this.usersRepository.findOneBy({ email: dataToValidate.email, recoveryCode: dataToValidate.code });
+        if (!user) {
+            return false;
+        }
+        return true;
     }
 }

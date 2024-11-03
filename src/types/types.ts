@@ -10,7 +10,7 @@ export interface UserInfo{
 
 
 export interface userLogin{
-    username: string;
+    email: string;
     password: string;
 }
 
@@ -21,5 +21,11 @@ export interface forgotPassword{
 
 export interface changePassword{
     password: string;
+    code: string;
+    email: string;
+}
+
+export interface validateCode{
+    email: string;
     code: string;
 }
