@@ -1,12 +1,12 @@
 //* Controlador del Usuario. Se manejan solo las solicitudes de los usuarios.
 //* El funcionamimento es el siguiente: Se recibe una solicitud, se procesa y se envía al servicio y se envía una respuesta 
 //* de regreso al controlador.
-
 import { Request, Response } from "express";
 import { User } from "../entities/User";
 import { UserService } from "../services/userservice";
 import { changePassword, forgotPassword, UserInfo, userLogin, validateCode } from "../types/types";
 import { Person } from "../entities/Persons";
+
 
 
 const userService = new UserService();
@@ -63,7 +63,16 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
             return res.status(422).json({ ok: false, message: 'User not found, please create an account' })
         }
 
-        return res.status(200).json({ ok: true, message: 'User logged in successfully', user: initUser });
+        return res.status(200).json({
+            ok: true,
+            message: 'User logged in successfully',
+            user: {
+                username: initUser.username,
+                email: initUser.email,
+                id_user: initUser.id_user,
+                token: initUser.token,
+            }
+        });
 
     } catch (error) {
         return res.status(422).json({ ok: false, message: 'There was an error when login user' })

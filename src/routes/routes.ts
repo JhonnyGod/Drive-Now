@@ -2,6 +2,8 @@
 
 import Router from "express";
 import { checkMatching, createUser, loginUser, newPassword, passwordForgot } from "../controllers/usercontroller";
+import { get } from "http";
+import { getVehicles } from "../controllers/vehiclecontroller";
 
 const routes = Router();
 
@@ -11,6 +13,7 @@ routes.post('/usuario/login', loginUser); //* Iniciar sesión, esta Ruta indica 
 routes.post('/usuario/recuperar', passwordForgot)
 routes.post('/usuario/validarCodigo', checkMatching)
 routes.put('/usuario/actualizaruser', newPassword)
+routes.post('/home/recuperarvehiculos', getVehicles)
 
 
 

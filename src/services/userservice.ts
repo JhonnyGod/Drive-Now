@@ -5,6 +5,7 @@ import { Person } from '../entities/Persons';
 import { changePassword, forgotPassword, UserInfo, userLogin, validateCode } from '../types/types';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from "jsonwebtoken";
+import { Vehicle } from '../entities/Vehicles';
 const nodemailer = require("nodemailer");
 
 
@@ -12,7 +13,7 @@ export class UserService {
 
     private usersRepository: Repository<User>;
     private personRepository: Repository<Person>;
-
+    
     constructor() {
         this.usersRepository = AppDataSource.getRepository(User);
         this.personRepository = AppDataSource.getRepository(Person);
@@ -75,11 +76,13 @@ export class UserService {
 
         const Token = jwt.sign(checkedUserData, jwtSecret, { expiresIn: "2h" }); //* Generar el token de autenticación
 
-        //TODO:Estoy pensando en donde guardar el token.
-
-        return { username: User.username, email: User.email, id_user: User.id, token: Token };
+        return {
+            username: User.username,
+            email: User.email,
+            id_user: User.id,
+            token: Token,
+        }
     }
-
 
     public async sendRecoveryEmail(userData: forgotPassword) {
         const { email } = userData;
