@@ -29,3 +29,8 @@ export interface validateCode{
     email: string;
     code: string;
 }
+
+export interface RentalInfo{
+    idvehiculo: number;
+    idpersona: number;
+}

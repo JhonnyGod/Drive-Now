@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BaseEntity } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BaseEntity, OneToOne } from 'typeorm';
 import { Rental } from './Rental';
+import { Images } from './Images';
 
 @Entity('Vehiculos')
 export class Vehicle extends BaseEntity{
@@ -36,4 +37,8 @@ export class Vehicle extends BaseEntity{
 
     @OneToMany(() => Rental, rental => rental.idvehiculo)
     alquileres?: Rental[]; 
+
+    @OneToOne(() => Images, image => image.vehicle)
+    image?: Images;
+
 }
