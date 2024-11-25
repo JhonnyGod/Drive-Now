@@ -1,7 +1,6 @@
 import { Repository } from "typeorm";
 import { AppDataSource } from "../database/connection";
 import { Vehicle } from "../entities/Vehicles";
-import { Person } from "../entities/Persons";
 import { User } from "../entities/User";
 const nodemailer = require("nodemailer");
 
@@ -30,7 +29,8 @@ export class VehicleService {
                 cilindraje: vehicle.cilindraje,
                 marca: vehicle.marca,
                 capacidad: vehicle.capacidad,
-                tipoCombustible: vehicle.tipoCombustible,
+                tipoCombustible: vehicle.combustible,
+                image_src: vehicle.image_src
             }));
 
             return {
@@ -66,11 +66,6 @@ export class VehicleService {
                 }
             })
 
-            console.log(user.email)
-            console.log(user.email)
-            console.log(user.email)
-            console.log(user.email)
-            console.log(user.email)
             const mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: user_email,
