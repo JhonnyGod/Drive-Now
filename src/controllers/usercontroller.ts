@@ -4,8 +4,9 @@
 import { Request, Response } from "express";
 import { User } from "../entities/User";
 import { UserService } from "../services/userservice";
-import { changePassword, forgotPassword, UserInfo, userLogin, validateCode } from "../types/types";
+import { AdminInfo, changePassword, forgotPassword, UserInfo, userLogin, validateCode } from "../types/types";
 import { Person } from "../entities/Persons";
+import { ok } from "assert";
 
 
 
@@ -78,8 +79,6 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
         return res.status(422).json({ ok: false, message: 'There was an error when login user' })
     }
 }
-
-
 export const passwordForgot = async (req: Request<{}, {}, forgotPassword>, res: Response) => {
     const { email } = req.body;
     try {
@@ -136,6 +135,22 @@ export const newPassword = async (req: Request<{}, {}, changePassword>, res: Res
 
     } catch (error) {
         return res.status(422).json({ ok: false, message: 'error while processing data' });
+    }
+}
+
+export const createAdminUser = async (req: Request<{}, {}, AdminInfo>, res: Response) => {
+    const {documento} = req.body;
+    if (!documento) {
+        return res.status(400).json({ ok: false, message: 'User info has missing fields' });
+    }
+    try {
+        const newAdmin = await userService.createAdmin(req.body);
+        if (!newAdmin) {
+            return res.status(400).json({ ok: false, message: 'There was an error while creating the admin user' });
+        }
+        return res.status(200).json({ok: true, message: 'Admin user created successfully', user: newAdmin.usuario});
+    } catch (error) {
+        return res.status(422).json({ ok: false, message: 'Error while processing data' });
     }
 }
 

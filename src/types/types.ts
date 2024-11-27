@@ -34,3 +34,7 @@ export interface RentalInfo{
     idvehiculo: number;
     idpersona: number;
 }
+
+export interface AdminInfo{
+    documento: string;
+}

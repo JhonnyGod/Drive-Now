@@ -1,7 +1,7 @@
 //* Estas son las rutas de las funciones, toda función debe llevar una ruta para ser accedida
 
 import Router from "express";
-import { checkMatching, createUser, loginUser, newPassword, passwordForgot } from "../controllers/usercontroller";
+import { checkMatching, createAdminUser, createUser, loginUser, newPassword, passwordForgot } from "../controllers/usercontroller";
 import { get } from "http";
 import { getVehicles, rentVehicle } from "../controllers/vehiclecontroller";
 
@@ -15,6 +15,7 @@ routes.post('/usuario/validarCodigo', checkMatching)
 routes.put('/usuario/actualizaruser', newPassword)
 routes.post('/home/recuperarvehiculos', getVehicles)
 routes.post('/home/rent', rentVehicle)
+routes.post('/usuario/crearadmin', createAdminUser)
 
 
 

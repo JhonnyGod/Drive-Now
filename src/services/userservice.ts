@@ -2,10 +2,11 @@ import { Code, Repository } from 'typeorm';
 import { User } from '../entities/User';
 import { AppDataSource } from '../database/connection';
 import { Person } from '../entities/Persons';
-import { changePassword, forgotPassword, UserInfo, userLogin, validateCode } from '../types/types';
+import { AdminInfo, changePassword, forgotPassword, UserInfo, userLogin, validateCode } from '../types/types';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from "jsonwebtoken";
 import { Vehicle } from '../entities/Vehicles';
+import { ok } from 'assert';
 const nodemailer = require("nodemailer");
 
 
@@ -13,7 +14,7 @@ export class UserService {
 
     private usersRepository: Repository<User>;
     private personRepository: Repository<Person>;
-    
+
     constructor() {
         this.usersRepository = AppDataSource.getRepository(User);
         this.personRepository = AppDataSource.getRepository(Person);
@@ -42,7 +43,6 @@ export class UserService {
 
         return { usuario: newUser, persona: person }
     }
-
 
     public async initUser(userData: userLogin) {
 
@@ -129,8 +129,6 @@ export class UserService {
             return { ok: false, message: 'Error while sending email', error: error };
         }
     }
-
-
     public async newPassword(userData: changePassword) {
         try {
             const { code, password, email } = userData;
@@ -160,5 +158,44 @@ export class UserService {
             return false;
         }
         return true;
+    }
+    public async createAdmin(adminDocument: AdminInfo) {
+        try {
+            const { documento } = adminDocument;
+            const person = await this.personRepository.findOneBy({ documento: documento });
+            console.log(person);
+            if (!person) {
+                return false;
+            }
+            const personUserId = person?.id_usuario
+            const personUser = await this.usersRepository.findOneBy({ id: personUserId?.toString() });
+            console.log(personUser);
+
+            if (!personUser) {
+                return false;
+            }
+            if (personUser.isAdmin) {
+                return{
+                        message: 'User is already an admin', usuario: {
+                        username: personUser.username,
+                        email: personUser.email,
+                        id_user: personUser.id
+                    }
+                };
+            }
+
+            personUser.isAdmin = true;
+            await this.usersRepository.save(personUser);
+
+            return { message: 'User is now an admin', usuario:{
+                username: personUser.username,
+                email: personUser.email,
+                id_user: personUser.id
+            } };
+
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 }
