@@ -2,6 +2,8 @@ import { Repository } from "typeorm";
 import { AppDataSource } from "../database/connection";
 import { Vehicle } from "../entities/Vehicles";
 import { User } from "../entities/User";
+import { VehicleInfo } from "../types/types";
+import { ok } from "assert";
 const nodemailer = require("nodemailer");
 
 
@@ -119,6 +121,19 @@ export class VehicleService {
         } catch (error) {
             console.log("Ocurrió un error al alquilar el vehículo", error);
             return false;
+        }
+    }
+
+    public async addvehicle(VehicleInfo: VehicleInfo) {
+        try {
+            const existingVehicle = await this.vehicleRepository.findOneBy({matricula: VehicleInfo.matricula});
+            if(existingVehicle){
+                return{ok: false, message: 'Vehicle already exists'}
+            }
+            const newVehicle = await this.vehicleRepository.save(VehicleInfo);
+            return newVehicle;
+        } catch (error) {
+            
         }
     }
 }

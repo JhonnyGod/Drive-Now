@@ -63,6 +63,14 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
         if (!initUser) {
             return res.status(422).json({ ok: false, message: 'User not found, please create an account' })
         }
+        const userToken = initUser.token;
+        res.cookie('Token', userToken,{
+            httpOnly: true,
+            secure: false,
+            maxAge: 1000 * 60 * 60 * 2,
+            sameSite: 'strict',
+             path: '/'
+        })
 
         return res.status(200).json({
             ok: true,
@@ -71,11 +79,11 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
                 username: initUser.username,
                 email: initUser.email,
                 id_user: initUser.id_user,
-                token: initUser.token,
             }
         });
 
     } catch (error) {
+        console.error(error);
         return res.status(422).json({ ok: false, message: 'There was an error when login user' })
     }
 }

@@ -6,8 +6,13 @@ import { AppDataSource } from "../database/connection";
 import routes from "../routes/routes";
 const cors = require('cors');
 
+const corsOptions = {
+    origin: 'http://localhost:3001', 
+    credentials: true,  
+}
+
 const app = express();
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

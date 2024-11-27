@@ -38,3 +38,18 @@ export interface RentalInfo{
 export interface AdminInfo{
     documento: string;
 }
+
+//? Tipos para los vehículos
+
+export interface VehicleInfo{
+    nombre: string;
+    matricula: string;
+    tipovehiculo: string;
+    modelo: string;
+    color: string;
+    cilindraje: number;
+    marca: string;
+    capacidad: string;
+    combustible: string;
+    image_src: string;
+}

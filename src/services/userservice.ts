@@ -45,7 +45,6 @@ export class UserService {
     }
 
     public async initUser(userData: userLogin) {
-
         const { email, password } = userData;
         if (!email || !password) {
             return false;
@@ -69,7 +68,8 @@ export class UserService {
         const checkedUserData = { //* Payload del usuario, se almacena esta información en el token
             username: User.username,
             email: User.email,
-            user_id: User.id
+            user_id: User.id,
+            is_admin: User.isAdmin
         }
 
         const jwtSecret = process.env.JWT_SECRET as Secret; //* Cambiar el tipo de la SecretWord de JWT

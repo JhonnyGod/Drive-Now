@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { VehicleService } from "../services/vehicleservice";
-import { RentalInfo } from "../types/types";
+import { RentalInfo, VehicleInfo } from "../types/types";
 
 const vehicleservice = new VehicleService();
 
@@ -27,4 +27,20 @@ export const rentVehicle = async (req: Request<{}, {}, RentalInfo>, res: Respons
     } catch (error) {
         return res.status(422).json({ ok: false, message: 'Error while processing data' });
     }   
+}
+
+export const addVehicle = async (req: Request<{},{},VehicleInfo>, res:Response) => {
+    const {nombre, matricula, tipovehiculo, modelo, color, cilindraje, marca, capacidad, combustible, image_src} = req.body;
+    if(!nombre || !matricula || !tipovehiculo || !modelo || !color || !cilindraje || !marca || !capacidad || !combustible || !image_src){
+        return res.status(400).json({ok: false, message: 'Missing fields'})
+    }
+    try {
+        const newVehicle = await vehicleservice.addvehicle(req.body);
+        if(!newVehicle){
+            return res.status(400).json({ok: false, message: 'Error while adding vehicle'})
+        }
+        return res.status(200).json({ok: true, vehicle: newVehicle})
+    } catch (error) {
+        return res.status(422).json({ok: false, message: 'Error while processing data'})
+    }
 }
