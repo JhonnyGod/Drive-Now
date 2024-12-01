@@ -64,12 +64,12 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
             return res.status(422).json({ ok: false, message: 'User not found, please create an account' })
         }
         const userToken = initUser.token;
-        res.cookie('Token', userToken,{
+        res.cookie('Token', userToken,{ //*Aqui lo que hago es guardar el token JWT del usuario en una cookie en el navegador
             httpOnly: true,
             secure: false,
             maxAge: 1000 * 60 * 60 * 2,
             sameSite: 'strict',
-             path: '/'
+            path: '/'
         })
 
         return res.status(200).json({
@@ -79,6 +79,7 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
                 username: initUser.username,
                 email: initUser.email,
                 id_user: initUser.id_user,
+                isAdmin: initUser.isAdmin
             }
         });
 

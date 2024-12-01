@@ -32,7 +32,8 @@ export class VehicleService {
                 marca: vehicle.marca,
                 capacidad: vehicle.capacidad,
                 tipoCombustible: vehicle.combustible,
-                image_src: vehicle.image_src
+                image_src: vehicle.image_src,
+                descripcion: vehicle.descripcion
             }));
 
             return {

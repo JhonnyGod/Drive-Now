@@ -81,6 +81,7 @@ export class UserService {
             email: User.email,
             id_user: User.id,
             token: Token,
+            isAdmin: User.isAdmin
         }
     }
 

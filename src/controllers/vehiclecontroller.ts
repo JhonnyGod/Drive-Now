@@ -28,7 +28,6 @@ export const rentVehicle = async (req: Request<{}, {}, RentalInfo>, res: Respons
         return res.status(422).json({ ok: false, message: 'Error while processing data' });
     }   
 }
-
 export const addVehicle = async (req: Request<{},{},VehicleInfo>, res:Response) => {
     const {nombre, matricula, tipovehiculo, modelo, color, cilindraje, marca, capacidad, combustible, image_src} = req.body;
     if(!nombre || !matricula || !tipovehiculo || !modelo || !color || !cilindraje || !marca || !capacidad || !combustible || !image_src){

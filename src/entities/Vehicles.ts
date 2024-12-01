@@ -33,6 +33,9 @@ export class Vehicle extends BaseEntity{
     @Column()
     combustible?: string;  
 
+    @Column({nullable: true})
+    descripcion?: string;
+
     @Column()
     image_src?: string;
 
