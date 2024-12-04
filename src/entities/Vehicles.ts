@@ -36,8 +36,12 @@ export class Vehicle extends BaseEntity{
     @Column({nullable: true})
     descripcion?: string;
 
+    @Column({nullable: true})
+    valor_dia?: number;
+
     @Column()
     image_src?: string;
+
 
     @OneToMany(() => Rental, rental => rental.idvehiculo)
     alquileres?: Rental[]; 
