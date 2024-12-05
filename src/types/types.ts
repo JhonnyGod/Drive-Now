@@ -53,3 +53,8 @@ export interface VehicleInfo{
     combustible: string;
     image_src: string;
 }
+
+export interface vehicleSearchFilter{
+    searchterm: string;
+    filterattribute: string;
+}

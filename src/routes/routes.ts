@@ -3,7 +3,7 @@
 import Router from "express";
 import { checkMatching, createAdminUser, createUser, loginUser, newPassword, passwordForgot } from "../controllers/usercontroller";
 import { get } from "http";
-import { addVehicle, getVehicles, rentVehicle } from "../controllers/vehiclecontroller";
+import { addVehicle, getVehicles, rentVehicle, searchVehicle } from "../controllers/vehiclecontroller";
 
 const routes = Router();
 
@@ -17,6 +17,7 @@ routes.post('/home/recuperarvehiculos', getVehicles)
 routes.post('/home/rent', rentVehicle)
 routes.post('/usuario/crearadmin', createAdminUser)
 routes.post('/admin/crearvehiculo', addVehicle )
+routes.get('/usuario/buscar', searchVehicle)
 
 
 

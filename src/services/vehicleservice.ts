@@ -1,8 +1,8 @@
-import { Repository } from "typeorm";
+import { ILike, Repository } from "typeorm";
 import { AppDataSource } from "../database/connection";
 import { Vehicle } from "../entities/Vehicles";
 import { User } from "../entities/User";
-import { VehicleInfo } from "../types/types";
+import { VehicleInfo, vehicleSearchFilter } from "../types/types";
 import { ok } from "assert";
 const nodemailer = require("nodemailer");
 
@@ -128,14 +128,40 @@ export class VehicleService {
 
     public async addvehicle(VehicleInfo: VehicleInfo) {
         try {
-            const existingVehicle = await this.vehicleRepository.findOneBy({matricula: VehicleInfo.matricula});
-            if(existingVehicle){
-                return{ok: false, message: 'Vehicle already exists'}
+            const existingVehicle = await this.vehicleRepository.findOneBy({ matricula: VehicleInfo.matricula });
+            if (existingVehicle) {
+                return { ok: false, message: 'Vehicle already exists' }
             }
             const newVehicle = await this.vehicleRepository.save(VehicleInfo);
             return newVehicle;
         } catch (error) {
-            
+
+        }
+    }
+
+    public async fuzzySearchVehicles(searchFilters: vehicleSearchFilter): Promise<Vehicle[]> {
+
+        const filterAttribute = searchFilters.filterattribute;
+        const searchTerm = searchFilters.searchterm;
+
+        const validAttributes = ['nombre', 'capacidad', 'tipovehiculo', 'modelo', 'color', 'cilindraje', 'marca', 'combustible']; 
+    
+        if (!validAttributes.includes(filterAttribute)) {
+            throw new Error('Atributo no válido para la búsqueda');
+        }
+    
+        try {
+            const vehicles = await this.vehicleRepository
+                .createQueryBuilder('vehicle')
+                .where(`SIMILARITY(vehicle.${filterAttribute}, :searchTerm) > 0.1`, { searchTerm })
+                .orderBy(`SIMILARITY(vehicle.${filterAttribute}, :searchTerm)`, 'DESC')
+                .setParameter('searchTerm', searchTerm)
+                .getMany();
+    
+            return vehicles;
+        } catch (error) {
+            console.error('Error en búsqueda difusa:', error);
+            throw new Error('Error al realizar la búsqueda difusa');
         }
     }
 }
