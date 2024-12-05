@@ -16,7 +16,7 @@ routes.put('/usuario/actualizaruser', newPassword)
 routes.post('/home/recuperarvehiculos', getVehicles)
 routes.post('/home/rent', rentVehicle)
 routes.post('/usuario/crearadmin', createAdminUser)
-routes.post('/usuario/crearvehiculo', addVehicle )
+routes.post('/admin/crearvehiculo', addVehicle )
 
 
 
