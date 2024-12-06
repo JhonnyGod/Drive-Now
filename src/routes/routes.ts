@@ -15,10 +15,11 @@ routes.post('/usuario/validarCodigo', checkMatching)
 routes.put('/usuario/actualizaruser', newPassword)
 routes.post('/home/recuperarvehiculos', getVehicles)
 routes.post('/home/rent', rentVehicle)
-routes.post('/usuario/crearadmin', createAdminUser)
 routes.post('/admin/crearvehiculo', addVehicle )
-routes.get('/usuario/buscar', searchVehicle)
+routes.post('/usuario/buscar', searchVehicle)
 
+//* Rutas Protegidas
+routes.post('/usuario/crearadmin', createAdminUser)
 
 
 

@@ -46,6 +46,12 @@ export const addVehicle = async (req: Request<{}, {}, VehicleInfo>, res: Respons
 
 export const searchVehicle = async (req: Request<{}, {}, vehicleSearchFilter>, res: Response) => {
     const { searchterm, filterattribute } = req.body;
+    const validAttributes = ['nombre', 'capacidad', 'tipovehiculo', 'modelo', 'color', 'cilindraje', 'marca', 'combustible'];
+
+    if (!validAttributes.includes(filterattribute)) {
+        console.log(filterattribute)
+        return res.status(400).json({ ok: false, message: 'Invalid filter attribute' })   
+    }
     if (!searchterm) {
         return res.status(400).json({ ok: false, message: 'No search term provided' })
     }

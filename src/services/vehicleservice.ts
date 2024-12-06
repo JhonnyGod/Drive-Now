@@ -3,7 +3,6 @@ import { AppDataSource } from "../database/connection";
 import { Vehicle } from "../entities/Vehicles";
 import { User } from "../entities/User";
 import { VehicleInfo, vehicleSearchFilter } from "../types/types";
-import { ok } from "assert";
 const nodemailer = require("nodemailer");
 
 
@@ -149,7 +148,7 @@ export class VehicleService {
         if (!validAttributes.includes(filterAttribute)) {
             throw new Error('Atributo no válido para la búsqueda');
         }
-    
+
         try {
             const vehicles = await this.vehicleRepository
                 .createQueryBuilder('vehicle')
