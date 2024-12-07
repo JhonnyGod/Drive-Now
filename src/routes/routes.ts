@@ -18,6 +18,8 @@ routes.post('/home/rent', rentVehicle)
 routes.post('/admin/crearvehiculo', addVehicle )
 routes.post('/usuario/buscar', searchVehicle)
 
+routes.post('/renta/alquilarvehiculo', rentVehicle)
+
 //* Rutas Protegidas
 routes.post('/usuario/crearadmin', createAdminUser)
 

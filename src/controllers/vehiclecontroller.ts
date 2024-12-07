@@ -17,6 +17,12 @@ export const getVehicles = async (req: Request, res: Response) => {
     }
 }
 export const rentVehicle = async (req: Request<{}, {}, RentalInfo>, res: Response) => {
+    const {id_usuario, id_vehiculo, fecha_inicio, fecha_fin, valor_total} = req.body;
+
+    if (!id_usuario || !id_vehiculo || !fecha_inicio || !fecha_fin || !valor_total) {
+        return res.status(400).json({ ok: false, message: 'Missing fields' });
+    }
+    
     try {
         const rent = await vehicleservice.rentvehicle(req.body);
         if (!rent) {

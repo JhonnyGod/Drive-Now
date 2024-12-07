@@ -29,6 +29,6 @@ export class Rental extends BaseEntity{
     @Column({ type: 'boolean', default: false })
     estado?: boolean;  
 
-    @OneToOne(() => Invoice, invoice => invoice.alquiler)  
-    invoice?: Invoice; 
+    @OneToOne(() => Invoice, (invoice) => invoice.alquiler, { cascade: true, onDelete: 'CASCADE' })
+    invoice?: Invoice;
 }

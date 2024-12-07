@@ -3,22 +3,30 @@ import { AppDataSource } from "../database/connection";
 import { Vehicle } from "../entities/Vehicles";
 import { User } from "../entities/User";
 import { VehicleInfo, vehicleSearchFilter } from "../types/types";
+import { Person } from "../entities/Persons";
+import { Invoice } from "../entities/Invoice";
+import { Rental } from "../entities/Rental";
 const nodemailer = require("nodemailer");
-
 
 export class VehicleService {
 
     private vehicleRepository: Repository<Vehicle>;
     private userRepository: Repository<User>;
+    private personRepository: Repository<Person>;
+    private invoiceRepository: Repository<Invoice>;
+    private rentalRepository: Repository<Rental>;
 
     constructor() {
         this.vehicleRepository = AppDataSource.getRepository(Vehicle);
         this.userRepository = AppDataSource.getRepository(User);
+        this.personRepository = AppDataSource.getRepository(Person);
+        this.invoiceRepository = AppDataSource.getRepository(Invoice);
+        this.rentalRepository = AppDataSource.getRepository(Rental);
     }
 
     public async getvehicles() {
         try {
-            const avaVehicles = await this.vehicleRepository.find();
+            const avaVehicles = await this.vehicleRepository.find({where: {disponible: true}});
 
             const vehicles = avaVehicles.map(vehicle => ({
                 idvehiculo: vehicle.idvehiculo,
@@ -47,82 +55,64 @@ export class VehicleService {
 
     public async rentvehicle(RentalInfo: any) {
         try {
-            const user = await this.userRepository.findOne({ where: { id: RentalInfo.id_user } });
-
+            const user = await this.userRepository.findOneBy({ id: RentalInfo.id_usuario });
             if (!user) {
-                return false;
+                return { ok: false, message: 'User not found' }
             }
-            const user_email = user.email;
 
-            const vehicle = await this.vehicleRepository.findOne({ where: { idvehiculo: RentalInfo.idvehiculo } });
+            const vehicle = await this.vehicleRepository.findOneBy({ idvehiculo: RentalInfo.id_vehiculo });
             if (!vehicle) {
-                return false;
+                return { ok: false, message: 'Vehicle not found' }
             }
-            const vehicle_name = vehicle.nombre;
-            const vehicle_plate = vehicle.matricula;
 
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS
-                }
-            })
+            await this.vehicleRepository.update({ idvehiculo: RentalInfo.id_vehiculo }, { disponible: false });
+        
+            const person = await this.personRepository.findOne({
+                where: { user: { id: user.id } },
+                relations: ['user'],  
+            });
 
-            const mailOptions = {
-                from: process.env.EMAIL_USER,
-                to: user_email,
-                subject: 'Notificación de Alquiler',
-                text: `
-                    You have just confirmed the rental of the vehicle: ${vehicle_name} with license plate: ${vehicle_plate}.
-                    ¿No alquilaste este vehículo? Contáctanos.
-                `,
-                html: `
-                    <!DOCTYPE html>
-                    <html lang="en">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>Notificación de Alquiler</title>
-                    </head>
-                    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-                        <header style="background-color: #4a90e2; color: #ffffff; padding: 20px; text-align: center;">
-                            <h1 style="margin: 0;">Notificación de Alquiler</h1>
-                        </header>
-                        
-                        <main style="padding: 20px;">
-                            <p>You have just confirmed the rental of the vehicle:</p>
-                            
-                            <ul>
-                                <li><strong>Vehicle Name:</strong> ${vehicle_name}</li>
-                                <li><strong>License Plate:</strong> ${vehicle_plate}</li>
-                            </ul>
-                            
-                            <p>Thank you for choosing Drive Now! We hope you enjoy your rental experience.</p>
-                        </main>
-                        
-                        <footer style="background-color: #f4f4f4; padding: 20px; text-align: center; font-size: 12px;">
-                            <p>&copy; 2023 Drive Now. All rights reserved.</p>
-                            <p>
-                                <a href="https://www.drivenow.com/terms" style="color: #4a90e2; text-decoration: none;">Terms of Service</a> | 
-                                <a href="https://www.drivenow.com/privacy" style="color: #4a90e2; text-decoration: none;">Privacy Policy</a>
-                            </p>
-                        </footer>
-                    </body>
-                    </html>
-                `,
-            };
-
-            const send = await transporter.sendMail(mailOptions);
-            if (send) {
-                console.log("Email Sent")
-                return { ok: true, message: "Notification sent" };
+            if (!person) {
+                return { ok: false, message: 'Person not found' }
             }
-            return true;
+
+            const document = person.documento;
+
+            const fecha_inicio = RentalInfo.fecha_inicio;
+            const fecha_fin = RentalInfo.fecha_fin;
+
+            const newRental = await this.rentalRepository.save({
+                fecha_inicio: fecha_inicio,
+                fecha_fin: fecha_fin,
+                fecha_devolucion: fecha_fin,
+                estado: true,
+                idcliente: { documento: document },
+                idvehiculo: { idvehiculo: RentalInfo.id_vehiculo },
+            });
+            
+            if (!newRental) {
+                return { ok: false, message: 'Error while renting vehicle' };
+            }
+            
+            // Asociar Rental al Invoice
+            const invoice = await this.invoiceRepository.save({
+                fecha: new Date(),
+                valor_total: RentalInfo.valor_total,
+                alquiler: newRental, 
+            });
+            
+            if (!invoice) {
+                return { ok: false, message: 'Error while creating invoice' };
+            }
+            
+            return { ok: true, message: 'Vehicle rented successfully' };
+
         } catch (error) {
-            console.log("Ocurrió un error al alquilar el vehículo", error);
+            console.log("Ocurrió un error al rentar el vehículo", error);
             return false;
+            
         }
+        
     }
 
     public async addvehicle(VehicleInfo: VehicleInfo) {

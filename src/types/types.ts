@@ -1,4 +1,4 @@
-export interface UserInfo{
+export interface UserInfo {
     username: string;
     password: string;
     email: string;
@@ -9,39 +9,42 @@ export interface UserInfo{
 }
 
 
-export interface userLogin{
+export interface userLogin {
     email: string;
     password: string;
 }
 
-export interface forgotPassword{
+export interface forgotPassword {
     email: string;
 }
 
 
-export interface changePassword{
+export interface changePassword {
     password: string;
     code: string;
     email: string;
 }
 
-export interface validateCode{
+export interface validateCode {
     email: string;
     code: string;
 }
 
-export interface RentalInfo{
-    idvehiculo: number;
-    idpersona: number;
+export interface RentalInfo {
+    id_usuario: number;
+    id_vehiculo: number;
+    fecha_inicio: Date;
+    fecha_fin: Date;
+    valor_total:string;
 }
 
-export interface AdminInfo{
+export interface AdminInfo {
     documento: string;
 }
 
 //? Tipos para los vehículos
 
-export interface VehicleInfo{
+export interface VehicleInfo {
     nombre: string;
     matricula: string;
     tipovehiculo: string;
@@ -54,7 +57,7 @@ export interface VehicleInfo{
     image_src: string;
 }
 
-export interface vehicleSearchFilter{
+export interface vehicleSearchFilter {
     searchterm: string;
     filterattribute: string;
 }
