@@ -176,8 +176,8 @@ export class UserService {
                 return false;
             }
             if (personUser.isAdmin) {
-                return{
-                        message: 'User is already an admin', usuario: {
+                return {
+                    message: 'User is already an admin', usuario: {
                         username: personUser.username,
                         email: personUser.email,
                         id_user: personUser.id
@@ -188,15 +188,47 @@ export class UserService {
             personUser.isAdmin = true;
             await this.usersRepository.save(personUser);
 
-            return { message: 'User is now an admin', usuario:{
-                username: personUser.username,
-                email: personUser.email,
-                id_user: personUser.id
-            } };
+            return {
+                message: 'User is now an admin', usuario: {
+                    username: personUser.username,
+                    email: personUser.email,
+                    id_user: personUser.id
+                }
+            };
 
         } catch (error) {
             console.log(error);
             return false;
         }
+    }
+
+    public async getUserData(userId: number) {
+
+        try {
+            const user = await this.usersRepository.findOneBy({ id: userId.toString() });
+            if (!user) {
+                return false;
+            }
+
+            const userPerson = await this.personRepository.findOneBy({ id_usuario: userId });
+            if (!userPerson) {
+                return false;
+            }
+
+            const userJsonData = {
+                username: user.username,
+                email: user.email,
+                name: userPerson.nombre,
+                lastname: userPerson.apellido,
+                phone: userPerson.telefono,
+                document: userPerson.documento,
+            }
+            
+            return userJsonData;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+
     }
 }

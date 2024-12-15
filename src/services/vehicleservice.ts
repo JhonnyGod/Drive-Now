@@ -116,15 +116,32 @@ export class VehicleService {
     }
 
     public async addvehicle(VehicleInfo: VehicleInfo) {
+        const newVehicleJson = {
+            nombre: VehicleInfo.nombre,
+            matricula: VehicleInfo.matricula,
+            tipovehiculo: VehicleInfo.tipovehiculo,
+            modelo: VehicleInfo.modelo,
+            color: VehicleInfo.color,
+            cilindraje: VehicleInfo.cilindraje,
+            marca: VehicleInfo.marca,
+            capacidad: VehicleInfo.capacidad,
+            combustible: VehicleInfo.combustible,
+            image_src: VehicleInfo.image_src,
+            disponible: true,
+        }
+
         try {
-            const existingVehicle = await this.vehicleRepository.findOneBy({ matricula: VehicleInfo.matricula });
+            const existingVehicle = await this.vehicleRepository.findOneBy({ matricula: VehicleInfo.matricula});
             if (existingVehicle) {
                 return { ok: false, message: 'Vehicle already exists' }
             }
-            const newVehicle = await this.vehicleRepository.save(VehicleInfo);
-            return newVehicle;
-        } catch (error) {
 
+            const newVehicle = await this.vehicleRepository.save(newVehicleJson);
+            return newVehicle;
+
+        } catch (error) {
+            console.log("Ocurrió un error al agregar el vehículo", error);
+            return false;
         }
     }
 

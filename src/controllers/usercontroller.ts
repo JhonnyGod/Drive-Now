@@ -163,4 +163,22 @@ export const createAdminUser = async (req: Request<{}, {}, AdminInfo>, res: Resp
     }
 }
 
+export const getUser = async (req:Request, res:Response) => {
+    const userId = req.body.userId;
+
+    if(!userId){
+        return res.status(400).json({ok:false, message: 'User info has missing fields'})
+    }
+    try {
+        const findUser = await userService.getUserData(userId)
+        if(!findUser){
+            return res.status(400).json({ok:false, message: 'No user found'})
+        }
+        return res.status(200).json({ok:true, user: findUser})
+    } catch (error) {
+        return res.status(422).json({ok:false, message: 'Error while processing data'})
+        
+    }
+}
+
 
