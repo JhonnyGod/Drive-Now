@@ -75,3 +75,7 @@ export interface updateUserInfo{
     email: string,
     userId: string
 }
+
+export interface getHistoryData {
+    userId: string;
+}

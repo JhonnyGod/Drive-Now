@@ -4,7 +4,7 @@
 import { Request, Response } from "express";
 import { User } from "../entities/User";
 import { UserService } from "../services/userservice";
-import { AdminInfo, changePassword, forgotPassword, updateUserInfo, UserInfo, userLogin, validateCode } from "../types/types";
+import { AdminInfo, changePassword, forgotPassword, getHistoryData, updateUserInfo, UserInfo, userLogin, validateCode } from "../types/types";
 import { Person } from "../entities/Persons";
 
 
@@ -169,7 +169,7 @@ export const getUser = async (req: Request, res: Response) => {
         if (!userId) {
             return res.status(400).json({ ok: false, message: 'User info has missing fields' });
         }
-    
+
         const searchUser = await userService.getUserData(userId);
         if (!searchUser) {
             return res.status(400).json({ ok: false, message: 'User not found' });
@@ -183,7 +183,7 @@ export const getUser = async (req: Request, res: Response) => {
 
 
 export const updateProfilePicture = async (req: Request, res: Response) => {
-    const {userId, profilePic} = req.body;
+    const { userId, profilePic } = req.body;
 
     if (!userId || !profilePic) {
         return res.status(400).json({ ok: false, message: 'User info has missing fields' });
@@ -196,14 +196,14 @@ export const updateProfilePicture = async (req: Request, res: Response) => {
             return res.status(400).json({ ok: false, message: 'Error while updating profile picture' });
         }
         return res.status(200).json({ ok: true, message: 'Profile picture updated successfully', user: updatePic });
-        
+
     } catch (error) {
         return res.status(422).json({ ok: false, message: 'Error while processing data' });
     }
 }
 
-export const updateUserC = async (req: Request <{},{},updateUserInfo>, res: Response) => {
-    const {username, name, lastname, document, phone, email, userId} = req.body;
+export const updateUserC = async (req: Request<{}, {}, updateUserInfo>, res: Response) => {
+    const { username, name, lastname, document, phone, email, userId } = req.body;
     console.log(req.body);
 
     if (!username || !name || !lastname || !document || !phone || !email || !userId) {
@@ -216,11 +216,34 @@ export const updateUserC = async (req: Request <{},{},updateUserInfo>, res: Resp
         if (!updateUser) {
             return res.status(400).json({ ok: false, message: 'Error while updating user' });
         }
-        return res.status(200).json({ ok: true, message: 'User updated'});
-        
+        return res.status(200).json({ ok: true, message: 'User updated' });
+
     } catch (error) {
         console.log(error);
         return res.status(422).json({ ok: false, message: 'Error while processing data' });
-        
+
     }
+}
+
+export const getHistory = async (req: Request<{}, {}, getHistoryData>, res: Response) => {
+    const { userId } = req.body;
+
+    if (!userId) {
+        return res.status(400).json({ ok: false, message: 'User info doesn contains userId' });
+    }
+
+    try {
+        const history = await userService.getHistory(req.body);
+
+        if (!history) {
+            return res.status(400).json({ ok: false, message: 'Error while getting history' });
+        }
+        return res.status(200).json({ ok: true, history });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(422).json({ ok: false, message: 'Error while processing data' });
+
+    }
+
 }

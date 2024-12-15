@@ -2,12 +2,13 @@ import { Code, Repository } from 'typeorm';
 import { User } from '../entities/User';
 import { AppDataSource } from '../database/connection';
 import { Person } from '../entities/Persons';
-import { AdminInfo, changePassword, forgotPassword, updateUserInfo, UserInfo, userLogin, validateCode } from '../types/types';
+import { AdminInfo, changePassword, forgotPassword, getHistoryData, updateUserInfo, UserInfo, userLogin, validateCode } from '../types/types';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from "jsonwebtoken";
 import { Vehicle } from '../entities/Vehicles';
 import { ok } from 'assert';
 import { profile } from 'console';
+import { Rental } from '../entities/Rental';
 const nodemailer = require("nodemailer");
 
 
@@ -15,10 +16,14 @@ export class UserService {
 
     private usersRepository: Repository<User>;
     private personRepository: Repository<Person>;
+    private rentalRepository: Repository<Rental>;
+    private vehicleRepository: Repository<Vehicle>;
 
     constructor() {
         this.usersRepository = AppDataSource.getRepository(User);
         this.personRepository = AppDataSource.getRepository(Person);
+        this.rentalRepository = AppDataSource.getRepository(Rental);
+        this.vehicleRepository = AppDataSource.getRepository(Vehicle);
     }
 
     public async crearUsuario(userInfo: UserInfo) {
@@ -250,7 +255,7 @@ export class UserService {
     }
 
     public async updateUser(userData: updateUserInfo) {
-        
+
         try {
             const { username, name, lastname, document, phone, email, userId } = userData;
             const user = await this.usersRepository.findOneBy({ id: userId });
@@ -284,6 +289,52 @@ export class UserService {
 
         } catch (error) {
             console.log(error);
+            return false;
+        }
+    }
+
+    public async getHistory(userId: getHistoryData) {
+        try {
+            const id = userId.userId;
+            const user = await this.usersRepository.findOneBy({ id: id });
+            if (!user) {
+                return false;
+            }
+    
+            const person = await this.personRepository.findOneBy({ id_usuario: Number(id) });
+            if (!person) {
+                return false;
+            }
+    
+            const document = person.documento;
+    
+            const userRentals = await this.rentalRepository.find({
+                where: {
+                    idcliente: { documento: document },
+                },
+                relations: ['idcliente', 'idvehiculo'], 
+            });
+    
+            const rentalHistory = userRentals.map((rental) => ({
+                idalquiler: rental.idalquiler,
+                fecha_inicio: rental.fecha_inicio,
+                fecha_fin: rental.fecha_fin,
+                estado: rental.estado,
+                cliente: {
+                    documento: rental.idcliente?.documento,
+                    nombre: rental.idcliente?.nombre,
+                   
+                },
+                vehiculo: {
+                    nombre: rental.idvehiculo?.nombre,
+                    matricula: rental.idvehiculo?.matricula, 
+                    image_src: rental.idvehiculo?.image_src,
+                },
+            }));
+    
+            return rentalHistory;
+        } catch (error) {
+            console.error(error);
             return false;
         }
     }
