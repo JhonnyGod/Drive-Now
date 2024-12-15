@@ -4,7 +4,7 @@
 import { Request, Response } from "express";
 import { User } from "../entities/User";
 import { UserService } from "../services/userservice";
-import { AdminInfo, changePassword, forgotPassword, UserInfo, userLogin, validateCode } from "../types/types";
+import { AdminInfo, changePassword, forgotPassword, updateUserInfo, UserInfo, userLogin, validateCode } from "../types/types";
 import { Person } from "../entities/Persons";
 
 
@@ -199,5 +199,28 @@ export const updateProfilePicture = async (req: Request, res: Response) => {
         
     } catch (error) {
         return res.status(422).json({ ok: false, message: 'Error while processing data' });
+    }
+}
+
+export const updateUserC = async (req: Request <{},{},updateUserInfo>, res: Response) => {
+    const {username, name, lastname, document, phone, email, userId} = req.body;
+    console.log(req.body);
+
+    if (!username || !name || !lastname || !document || !phone || !email || !userId) {
+        return res.status(400).json({ ok: false, message: 'User info has missing fields' });
+    }
+
+    try {
+        const updateUser = await userService.updateUser(req.body);
+
+        if (!updateUser) {
+            return res.status(400).json({ ok: false, message: 'Error while updating user' });
+        }
+        return res.status(200).json({ ok: true, message: 'User updated'});
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(422).json({ ok: false, message: 'Error while processing data' });
+        
     }
 }

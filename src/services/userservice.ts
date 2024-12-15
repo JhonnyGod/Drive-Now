@@ -2,7 +2,7 @@ import { Code, Repository } from 'typeorm';
 import { User } from '../entities/User';
 import { AppDataSource } from '../database/connection';
 import { Person } from '../entities/Persons';
-import { AdminInfo, changePassword, forgotPassword, UserInfo, userLogin, validateCode } from '../types/types';
+import { AdminInfo, changePassword, forgotPassword, updateUserInfo, UserInfo, userLogin, validateCode } from '../types/types';
 import bcrypt from 'bcrypt';
 import jwt, { Secret } from "jsonwebtoken";
 import { Vehicle } from '../entities/Vehicles';
@@ -242,6 +242,45 @@ export class UserService {
             user.profileImage = imageSrc;
             await this.usersRepository.save(user);
             return true;
+
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+    public async updateUser(userData: updateUserInfo) {
+        
+        try {
+            const { username, name, lastname, document, phone, email, userId } = userData;
+            const user = await this.usersRepository.findOneBy({ id: userId });
+
+            if (!user) {
+                console.log("User not found");
+                return false;
+            }
+            const person = await this.personRepository.findOneBy({ id_usuario: Number(user.id) });
+
+            if (!person) {
+                return false;
+            }
+
+            user.username = username;
+            person.nombre = name;
+            person.apellido = lastname;
+            person.documento = document;
+            person.telefono = phone;
+            await this.usersRepository.save(user);
+            await this.personRepository.save(person);
+
+            return {
+                username: user.username,
+                email: user.email,
+                name: person.nombre,
+                lastname: person.apellido,
+                document: person.documento,
+                phone: person.telefono
+            }
 
         } catch (error) {
             console.log(error);

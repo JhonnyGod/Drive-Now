@@ -65,3 +65,13 @@ export interface vehicleSearchFilter {
 export interface getUser {
     id: string;
 }
+
+export interface updateUserInfo{
+    username: string, 
+    name: string,
+    lastname: string,
+    document: string, 
+    phone: string, 
+    email: string,
+    userId: string
+}

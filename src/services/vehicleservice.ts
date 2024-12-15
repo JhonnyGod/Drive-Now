@@ -170,4 +170,6 @@ export class VehicleService {
             throw new Error('Error al realizar la búsqueda difusa');
         }
     }
+
+    
 }
