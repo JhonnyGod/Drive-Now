@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 import jwt, { Secret } from "jsonwebtoken";
 import { Vehicle } from '../entities/Vehicles';
 import { ok } from 'assert';
+import { profile } from 'console';
 const nodemailer = require("nodemailer");
 
 
@@ -222,13 +223,29 @@ export class UserService {
                 lastname: userPerson.apellido,
                 phone: userPerson.telefono,
                 document: userPerson.documento,
+                profileImage: user.profileImage
             }
-            
             return userJsonData;
         } catch (error) {
             console.log(error);
             return false;
         }
 
+    }
+
+    public async updateProfilePicture(userId: string, imageSrc: string) {
+        try {
+            const user = await this.usersRepository.findOneBy({ id: userId });
+            if (!user) {
+                return false;
+            }
+            user.profileImage = imageSrc;
+            await this.usersRepository.save(user);
+            return true;
+
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 }

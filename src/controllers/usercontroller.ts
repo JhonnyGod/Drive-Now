@@ -6,7 +6,6 @@ import { User } from "../entities/User";
 import { UserService } from "../services/userservice";
 import { AdminInfo, changePassword, forgotPassword, UserInfo, userLogin, validateCode } from "../types/types";
 import { Person } from "../entities/Persons";
-import { ok } from "assert";
 
 
 
@@ -64,7 +63,7 @@ export const loginUser = async (req: Request<{}, {}, userLogin>, res: Response) 
             return res.status(422).json({ ok: false, message: 'User not found, please create an account' })
         }
         const userToken = initUser.token;
-        res.cookie('Token', userToken,{ //*Aqui lo que hago es guardar el token JWT del usuario en una cookie en el navegador
+        res.cookie('Token', userToken, { //*Aqui lo que hago es guardar el token JWT del usuario en una cookie en el navegador
             httpOnly: true,
             secure: false,
             maxAge: 1000 * 60 * 60 * 2,
@@ -148,7 +147,7 @@ export const newPassword = async (req: Request<{}, {}, changePassword>, res: Res
 }
 
 export const createAdminUser = async (req: Request<{}, {}, AdminInfo>, res: Response) => {
-    const {documento} = req.body;
+    const { documento } = req.body;
     if (!documento) {
         return res.status(400).json({ ok: false, message: 'User info has missing fields' });
     }
@@ -157,28 +156,48 @@ export const createAdminUser = async (req: Request<{}, {}, AdminInfo>, res: Resp
         if (!newAdmin) {
             return res.status(400).json({ ok: false, message: 'There was an error while creating the admin user' });
         }
-        return res.status(200).json({ok: true, message: 'Admin user created successfully', user: newAdmin.usuario});
+        return res.status(200).json({ ok: true, message: 'Admin user created successfully', user: newAdmin.usuario });
     } catch (error) {
         return res.status(422).json({ ok: false, message: 'Error while processing data' });
     }
 }
 
-export const getUser = async (req:Request, res:Response) => {
+export const getUser = async (req: Request, res: Response) => {
     const userId = req.body.userId;
 
-    if(!userId){
-        return res.status(400).json({ok:false, message: 'User info has missing fields'})
-    }
     try {
-        const findUser = await userService.getUserData(userId)
-        if(!findUser){
-            return res.status(400).json({ok:false, message: 'No user found'})
+        if (!userId) {
+            return res.status(400).json({ ok: false, message: 'User info has missing fields' });
         }
-        return res.status(200).json({ok:true, user: findUser})
+    
+        const searchUser = await userService.getUserData(userId);
+        if (!searchUser) {
+            return res.status(400).json({ ok: false, message: 'User not found' });
+        }
+        return res.status(200).json({ ok: true, user: searchUser });
     } catch (error) {
-        return res.status(422).json({ok:false, message: 'Error while processing data'})
-        
+        return res.status(422).json({ ok: false, message: 'Error while processing data' });
     }
+
 }
 
 
+export const updateProfilePicture = async (req: Request, res: Response) => {
+    const {userId, profilePic} = req.body;
+
+    if (!userId || !profilePic) {
+        return res.status(400).json({ ok: false, message: 'User info has missing fields' });
+    }
+
+    try {
+        const updatePic = await userService.updateProfilePicture(userId, profilePic);
+
+        if (!updatePic) {
+            return res.status(400).json({ ok: false, message: 'Error while updating profile picture' });
+        }
+        return res.status(200).json({ ok: true, message: 'Profile picture updated successfully', user: updatePic });
+        
+    } catch (error) {
+        return res.status(422).json({ ok: false, message: 'Error while processing data' });
+    }
+}

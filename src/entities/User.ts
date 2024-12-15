@@ -18,6 +18,9 @@ export class User extends BaseEntity {
     @Column({type: 'varchar', nullable: true})
     recoveryCode?: string | null | undefined;
 
+    @Column({type: 'varchar', nullable: true})
+    profileImage?: string | null | undefined;
+
     @Column({type: 'boolean', default: false})
     isAdmin?: boolean;
 

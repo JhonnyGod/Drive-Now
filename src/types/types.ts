@@ -61,3 +61,7 @@ export interface vehicleSearchFilter {
     searchterm: string;
     filterattribute: string;
 }
+
+export interface getUser {
+    id: string;
+}
