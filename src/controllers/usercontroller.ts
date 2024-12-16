@@ -181,7 +181,6 @@ export const getUser = async (req: Request, res: Response) => {
 
 }
 
-
 export const updateProfilePicture = async (req: Request, res: Response) => {
     const { userId, profilePic } = req.body;
 
@@ -247,3 +246,20 @@ export const getHistory = async (req: Request<{}, {}, getHistoryData>, res: Resp
     }
 
 }
+
+export const getDevolutionProcesses = async (req: Request, res: Response) => {
+    try {
+        const processes = await userService.getDevolutionProcesses();
+        if (!processes) {
+            return res.status(400).json({ ok: false, message: 'Error while getting devolution processes' });
+        }
+        return res.status(200).json({ ok: true, processes });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(422).json({ ok: false, message: 'Error while processing data' });
+
+    }
+}
+
+

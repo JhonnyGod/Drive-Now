@@ -338,4 +338,42 @@ export class UserService {
             return false;
         }
     }
+
+    public async getDevolutionProcesses() {
+        try {
+            const processes = await this.rentalRepository.find({
+                where: { estado: 'in progress' },
+                relations: ['idcliente', 'idvehiculo'], 
+            });
+    
+            if (!processes || processes.length === 0) {
+                return false;
+            }
+    
+            const processList = processes.map((process) => ({
+                idalquiler: process.idalquiler,
+                fecha_inicio: process.fecha_inicio,
+                fecha_fin: process.fecha_fin,
+                fecha_devolucion: process.fecha_devolucion,
+    
+                cliente: {
+                    documento: process.idcliente?.documento || null,
+                    nombre: process.idcliente?.nombre || null,
+                    phone: process.idcliente?.telefono || null,
+
+                },
+                vehiculo: {
+                    nombre: process.idvehiculo?.nombre || null,
+                    matricula: process.idvehiculo?.matricula || null,
+                    image_src: process.idvehiculo?.image_src || null,
+                },
+            }));
+
+            return processList;
+
+        } catch (error) {
+            console.error('Error en getDevolutionProcesses:', error);
+            return false;
+        }
+    }
 }

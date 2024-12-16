@@ -26,8 +26,8 @@ export class Rental extends BaseEntity{
     @Column({ type: 'date', nullable: true })
     fecha_devolucion?: Date | null;  
 
-    @Column({ type: 'boolean', default: false })
-    estado?: boolean;  
+    @Column({ type: 'varchar', default: 'rented' })
+    estado?: string;  
 
     @OneToOne(() => Invoice, (invoice) => invoice.alquiler, { cascade: true, onDelete: 'CASCADE' })
     invoice?: Invoice;

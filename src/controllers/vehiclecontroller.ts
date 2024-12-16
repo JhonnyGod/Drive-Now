@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { VehicleService } from "../services/vehicleservice";
-import { RentalInfo, VehicleInfo, vehicleSearchFilter } from "../types/types";
+import { handleDevolutionInfo, RentalInfo, VehicleInfo, vehicleSearchFilter } from "../types/types";
 
 const vehicleservice = new VehicleService();
 
@@ -17,7 +17,7 @@ export const getVehicles = async (req: Request, res: Response) => {
     }
 }
 export const rentVehicle = async (req: Request<{}, {}, RentalInfo>, res: Response) => {
-    const {id_usuario, id_vehiculo, fecha_inicio, fecha_fin, valor_total} = req.body;
+    const { id_usuario, id_vehiculo, fecha_inicio, fecha_fin, valor_total } = req.body;
 
     if (!id_usuario || !id_vehiculo || !fecha_inicio || !fecha_fin || !valor_total) {
         return res.status(400).json({ ok: false, message: 'Missing fields' });
@@ -35,9 +35,8 @@ export const rentVehicle = async (req: Request<{}, {}, RentalInfo>, res: Respons
     }
 }
 export const addVehicle = async (req: Request<{}, {}, VehicleInfo>, res: Response) => {
-    const { nombre, matricula, tipovehiculo, modelo, color, cilindraje, marca, capacidad, combustible, image_src } = req.body;
-    if (!nombre || !matricula || !tipovehiculo || !modelo || !color || !cilindraje || !marca || !capacidad || !combustible || !image_src) {
-        console.log(req.body)
+    const { nombre, matricula, tipovehiculo, modelo, color, cilindraje, marca, capacidad, combustible, image_src, descripcion, valor_dia } = req.body;
+    if (!nombre || !matricula || !tipovehiculo || !modelo || !color || !cilindraje || !marca || !capacidad || !combustible || !image_src || !descripcion || !valor_dia) {
         return res.status(400).json({ ok: false, message: 'Missing fields' })
     }
     try {
@@ -57,7 +56,7 @@ export const searchVehicle = async (req: Request<{}, {}, vehicleSearchFilter>, r
 
     if (!validAttributes.includes(filterattribute)) {
         console.log(filterattribute)
-        return res.status(400).json({ ok: false, message: 'Invalid filter attribute' })   
+        return res.status(400).json({ ok: false, message: 'Invalid filter attribute' })
     }
     if (!searchterm) {
         return res.status(400).json({ ok: false, message: 'No search term provided' })
@@ -74,6 +73,51 @@ export const searchVehicle = async (req: Request<{}, {}, vehicleSearchFilter>, r
     }
     catch (error) {
         return res.status(422).json({ ok: false, message: 'Error while processing data' })
+
+    }
+}
+
+export const handleDevolution = async (req: Request<{}, {}, handleDevolutionInfo>, res: Response) => {
+    const { goodCondition, earlyReturn, earlyReturnReason, rating, rentalId } = req.body;
+
+    console.log(req.body)
+
+    if (goodCondition == null || earlyReturn == null || !rating || !rentalId) {
+        return res.status(400).json({ ok: false, message: 'Missing fields' })
+    }
+
+    try {
+        const devolution = await vehicleservice.handleDevolutionProcess(req.body);
+
+        if (!devolution) {
+            return res.status(400).json({ ok: false, message: 'Vehicle return failed' })
+        }
+
+        return res.status(200).json({ ok: true, message: 'Vehicle returned, in await of manager response.' })
+    } catch (error) {
+        console.log(error)
+        return res.status(422).json({ ok: false, message: 'Error while processing data' })
+
+    }
+
+}
+
+export const finishDevolutionProcess = async (req: Request, res: Response) => {
+    const idalquiler = req.body.idalquiler;
+    if (!idalquiler) {
+        return res.status(400).json({ ok: false, message: 'User info has missing fields' });
+    }
+    try {
+        const handleDevolution = await vehicleservice.finishDevolution(idalquiler);
+
+        if (!handleDevolution) {
+            return res.status(400).json({ ok: false, message: 'Error while handling devolution process' });
+        }
+        return res.status(200).json({ ok: true, message: 'Devolution process handled' });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(422).json({ ok: false, message: 'Error while processing data' });
 
     }
 }

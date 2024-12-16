@@ -1,9 +1,8 @@
 //* Estas son las rutas de las funciones, toda función debe llevar una ruta para ser accedida
 
 import Router from "express";
-import { checkMatching, createAdminUser, createUser, getHistory, getUser, loginUser, newPassword, passwordForgot, updateProfilePicture, updateUserC } from "../controllers/usercontroller";
-import { get } from "http";
-import { addVehicle, getVehicles, rentVehicle, searchVehicle } from "../controllers/vehiclecontroller";
+import { checkMatching, createAdminUser, createUser, getDevolutionProcesses, getHistory, getUser, loginUser, newPassword, passwordForgot, updateProfilePicture, updateUserC } from "../controllers/usercontroller";
+import { addVehicle, finishDevolutionProcess, getVehicles, handleDevolution, rentVehicle, searchVehicle } from "../controllers/vehiclecontroller";
 
 const routes = Router();
 
@@ -24,8 +23,12 @@ routes.post('/usuario/actualizarfoto', updateProfilePicture)
 routes.post('/usuario/actualizar', updateUserC)
 routes.post('/usuario/historial', getHistory)
 
+routes.post('/usuario/devolver', handleDevolution)
+
 //* Rutas Protegidas
 routes.post('/usuario/crearadmin', createAdminUser)
+routes.post('/usuario/devoluciones', getDevolutionProcesses)
+routes.post('/vehiculos/aceptardevolucion', finishDevolutionProcess)
 
 
 

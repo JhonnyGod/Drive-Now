@@ -55,6 +55,8 @@ export interface VehicleInfo {
     capacidad: string;
     combustible: string;
     image_src: string;
+    descripcion: string;
+    valor_dia: number;
 }
 
 export interface vehicleSearchFilter {
@@ -78,4 +80,12 @@ export interface updateUserInfo{
 
 export interface getHistoryData {
     userId: string;
+}
+
+export interface handleDevolutionInfo {
+    goodCondition: boolean;
+    earlyReturn: boolean;
+    earlyReturnReason: string;
+    rating: number;
+    rentalId: number;
 }
