@@ -2,7 +2,7 @@
 
 import Router from "express";
 import { checkMatching, createAdminUser, createUser, getDevolutionProcesses, getHistory, getUser, loginUser, newPassword, passwordForgot, updateProfilePicture, updateUserC } from "../controllers/usercontroller";
-import { addVehicle, finishDevolutionProcess, getVehicles, handleDevolution, rentVehicle, searchVehicle } from "../controllers/vehiclecontroller";
+import { addVehicle, deleteVehicle, editVehicleInfo, finishDevolutionProcess, getVehicles, handleDevolution, rentVehicle, searchVehicle } from "../controllers/vehiclecontroller";
 
 const routes = Router();
 
@@ -25,10 +25,13 @@ routes.post('/usuario/historial', getHistory)
 
 routes.post('/usuario/devolver', handleDevolution)
 
+
 //* Rutas Protegidas
 routes.post('/usuario/crearadmin', createAdminUser)
 routes.post('/usuario/devoluciones', getDevolutionProcesses)
 routes.post('/vehiculos/aceptardevolucion', finishDevolutionProcess)
+routes.post('/vehiculos/editarvehiculo', editVehicleInfo)
+routes.post('/vehiculos/eliminarvehiculo', deleteVehicle)
 
 
 

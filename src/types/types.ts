@@ -89,3 +89,19 @@ export interface handleDevolutionInfo {
     rating: number;
     rentalId: number;
 }
+
+export interface updateVehicleInfo {
+    idvehiculo: number;
+    nombre: string;
+    matricula: string;
+    tipovehiculo: string;
+    modelo: string;
+    color: string;
+    cilindraje: number;
+    marca: string;
+    capacidad: string;
+    combustible: string;
+    image_src: string;
+    descripcion: string;
+    valor_dia: number;
+}

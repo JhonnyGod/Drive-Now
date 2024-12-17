@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { VehicleService } from "../services/vehicleservice";
-import { handleDevolutionInfo, RentalInfo, VehicleInfo, vehicleSearchFilter } from "../types/types";
+import { handleDevolutionInfo, RentalInfo, updateVehicleInfo, VehicleInfo, vehicleSearchFilter } from "../types/types";
 
 const vehicleservice = new VehicleService();
 
@@ -49,7 +49,6 @@ export const addVehicle = async (req: Request<{}, {}, VehicleInfo>, res: Respons
         return res.status(422).json({ ok: false, message: 'Error while processing data' })
     }
 }
-
 export const searchVehicle = async (req: Request<{}, {}, vehicleSearchFilter>, res: Response) => {
     const { searchterm, filterattribute } = req.body;
     const validAttributes = ['nombre', 'capacidad', 'tipovehiculo', 'modelo', 'color', 'cilindraje', 'marca', 'combustible'];
@@ -79,9 +78,7 @@ export const searchVehicle = async (req: Request<{}, {}, vehicleSearchFilter>, r
 
 export const handleDevolution = async (req: Request<{}, {}, handleDevolutionInfo>, res: Response) => {
     const { goodCondition, earlyReturn, earlyReturnReason, rating, rentalId } = req.body;
-
     console.log(req.body)
-
     if (goodCondition == null || earlyReturn == null || !rating || !rentalId) {
         return res.status(400).json({ ok: false, message: 'Missing fields' })
     }
@@ -119,5 +116,38 @@ export const finishDevolutionProcess = async (req: Request, res: Response) => {
         console.log(error);
         return res.status(422).json({ ok: false, message: 'Error while processing data' });
 
+    }
+}
+
+export const editVehicleInfo = async (req: Request<{}, {}, updateVehicleInfo>, res: Response) => {
+    const { idvehiculo, nombre, matricula, tipovehiculo, modelo, color, cilindraje, marca, capacidad, combustible, image_src, descripcion, valor_dia } = req.body;
+
+    if (!nombre || !matricula || !tipovehiculo || !modelo || !color || !cilindraje || !marca || !capacidad || !combustible || !image_src || !descripcion || !valor_dia || !idvehiculo) {
+        return res.status(400).json({ ok: false, message: 'Missing fields' })
+    }
+    try {
+        const updatedVehicle = await vehicleservice.editVehicle(req.body);
+        if (!updatedVehicle) {
+            return res.status(400).json({ ok: false, message: 'Error while updating vehicle' })
+        }
+        return res.status(200).json({ ok: true, vehicle: updatedVehicle })
+    } catch (error) {
+        return res.status(422).json({ ok: false, message: 'Error while processing data' })
+    }
+}
+
+export const deleteVehicle = async (req: Request, res: Response) => {
+    const idvehiculo = req.body.idvehiculo;
+    if (!idvehiculo) {
+        return res.status(400).json({ ok: false, message: 'Missing fields' })
+    }
+    try {
+        const deletedVehicle = await vehicleservice.deleteVehicle(idvehiculo);
+        if (!deletedVehicle) {
+            return res.status(400).json({ ok: false, message: 'Error while deleting vehicle' })
+        }
+        return res.status(200).json({ ok: true, message: 'Vehicle deleted' })
+    } catch (error) {
+        return res.status(422).json({ ok: false, message: 'Error while processing data' })
     }
 }

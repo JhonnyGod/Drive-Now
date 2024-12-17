@@ -2,11 +2,10 @@ import { ILike, Repository } from "typeorm";
 import { AppDataSource } from "../database/connection";
 import { Vehicle } from "../entities/Vehicles";
 import { User } from "../entities/User";
-import { handleDevolutionInfo, VehicleInfo, vehicleSearchFilter } from "../types/types";
+import { handleDevolutionInfo, updateVehicleInfo, VehicleInfo, vehicleSearchFilter } from "../types/types";
 import { Person } from "../entities/Persons";
 import { Invoice } from "../entities/Invoice";
 import { Rental } from "../entities/Rental";
-import { describe } from "node:test";
 import { Return } from "../entities/Return";
 const nodemailer = require("nodemailer");
 
@@ -196,6 +195,7 @@ export class VehicleService {
             const id_user = rental.idcliente;
             const id_vehicle = rental.idvehiculo;
 
+
             console.log("el id del usuario es:", id_user?.id_usuario);
             console.log("el id del vehículo es", id_vehicle?.idvehiculo);
 
@@ -235,13 +235,59 @@ export class VehicleService {
                 return false;
             }
 
+            const user = await this.userRepository.findOneBy({ id: id_user.id_usuario?.toString() });
+            const email = user?.email;
+            if (!email) {
+                console.log("El usuario no tiene un correo registrado");
+                return false;
+            }
+            const transporter = nodemailer.createTransport({
+                service: process.env.service,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            });
+
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: 'jhonyfernando989@gmail.com',
+                subject: 'Confirmación de Devolución',
+                html: `
+                <div style="font-family: Arial, sans-serif; color: #333; background-color: #f9f9f9; padding: 20px; border-radius: 8px; max-width: 600px; margin: 0 auto;">
+                    <div style="text-align: center; background-color: #4CAF50; color: white; padding: 20px; border-radius: 8px;">
+                        <h1 style="margin: 0;">Devolución Registrada</h1>
+                        <p style="font-size: 18px;">¡Gracias por utilizar nuestro servicio!</p>
+                    </div>
+            
+                    <div style="padding: 20px; background-color: #fff; border-radius: 8px; margin-top: 20px;">
+                        <p style="font-size: 16px;">Estimado/a <strong>${person.nombre}</strong>,</p>
+                        <p style="font-size: 16px;">Nos complace informarte que la devolución del vehículo con <strong>ID ${vehicle.idvehiculo}</strong> ha sido registrada correctamente.</p>
+                        <p style="font-size: 16px;">Si necesitas más información, no dudes en contactarnos.</p>
+                    </div>
+            
+                    <div style="text-align: center; margin-top: 30px; background-color: #4CAF50; color: white; padding: 10px; border-radius: 8px;">
+                        <p style="font-size: 16px; margin: 0;">Atentamente,</p>
+                        <p style="font-size: 16px; margin: 0;">El equipo de Alquiler de Vehículos Drive Now</p>
+                    </div>
+            
+                    <div style="text-align: center; margin-top: 20px;">
+                        <p style="font-size: 14px; color: #999;">Este es un correo automático, por favor no respondas a este mensaje.</p>
+                    </div>
+                </div>
+                `
+            };
+
+            await transporter.sendMail(mailOptions);
+
+            console.log("Correo de confirmación enviado al usuario.");
             console.log("Devolución registrada y alquiler actualizado correctamente.");
-            return true;  // Todo salió bien
+            return true; // Todo salió bien
+
         }
         catch (error) {
             console.error('Error en el proceso de devolución:', error);
             return false;
-
         }
 
     }
@@ -293,11 +339,9 @@ export class VehicleService {
             // Actualizar disponibilidad del vehículo
             foundVehicle.disponible = true;
 
-            // Guardar los cambios en el vehículo
             await this.vehicleRepository.save(foundVehicle);
             console.log("Vehículo asociado:", foundVehicle);
 
-            // Guardar los cambios en el alquiler
             await this.rentalRepository.save(rental);
 
             return { ok: true, message: 'Devolution process completed successfully' };
@@ -305,6 +349,54 @@ export class VehicleService {
         } catch (error) {
             console.log("Ocurrió un error al finalizar el proceso de devolución", error);
             return { ok: false, message: 'An error occurred while processing the devolution' };
+        }
+    }
+
+    public async editVehicle(VehicleInfo: updateVehicleInfo) {
+        try {
+            const vehicle = await this.vehicleRepository.findOneBy({ idvehiculo: VehicleInfo.idvehiculo });
+            if (!vehicle) {
+                return { ok: false, message: 'Vehicle not found' }
+            }
+
+            const updatedVehicle = await this.vehicleRepository.save({
+                idvehiculo: VehicleInfo.idvehiculo,
+                nombre: VehicleInfo.nombre,
+                matricula: VehicleInfo.matricula,
+                tipovehiculo: VehicleInfo.tipovehiculo,
+                modelo: VehicleInfo.modelo,
+                color: VehicleInfo.color,
+                cilindraje: VehicleInfo.cilindraje,
+                marca: VehicleInfo.marca,
+                capacidad: VehicleInfo.capacidad,
+                combustible: VehicleInfo.combustible,
+                image_src: VehicleInfo.image_src,
+                disponible: true,
+                descripcion: VehicleInfo.descripcion,
+                valor_dia: VehicleInfo.valor_dia
+            });
+
+            return updatedVehicle;
+
+        } catch (error) {
+            console.log("Ocurrió un error al editar el vehículo", error);
+            return false;
+        }
+    }
+
+    public async deleteVehicle(idvehiculo: number) {
+        try {
+            const vehicle = await this.vehicleRepository.findOneBy({ idvehiculo: idvehiculo });
+            if (!vehicle) {
+                return { ok: false, message: 'Vehicle not found' }
+            }
+
+            const deletedVehicle = await this.vehicleRepository.delete({ idvehiculo: idvehiculo });
+            return deletedVehicle;
+
+        } catch (error) {
+            console.log("Ocurrió un error al eliminar el vehículo", error);
+            return false;
         }
     }
 }
